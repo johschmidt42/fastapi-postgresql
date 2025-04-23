@@ -1,5 +1,5 @@
 from typing import Annotated
-from uuid import UUID
+
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 
@@ -37,7 +37,7 @@ async def get_user(
 @router.put(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def update_user(
     db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[UUID, Path(...)],
+    user_id: Annotated[str, Path(...)],
     update: Annotated[UserUpdate, Body(...)],
 ) -> User:
     user_id: str = await db.update_user(user_id, update)
@@ -49,6 +49,6 @@ async def update_user(
 )
 async def delete_user(
     db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[UUID, Path(...)],
+    user_id: Annotated[str, Path(...)],
 ) -> None:
     await db.delete_user(user_id)

@@ -11,7 +11,7 @@
 make start-db
 ```
 
-- Create the tables by executing the SQL statements in [schema.sql](db/schema.sql).
+- Create the tables by executing the SQL statements in [db/schema.sql](db/schema.sql).
 
 ### FastAPI with psycopg
 

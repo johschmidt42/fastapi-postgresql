@@ -1,5 +1,5 @@
 from typing import TypeVar
-from uuid import UUID
+
 
 from psycopg import AsyncConnection
 from psycopg.abc import Query
@@ -38,7 +38,7 @@ class Database:
 
     async def _update_resource(
         self, query: Query, update: BaseModel, **kwargs
-    ) -> UUID | None:
+    ) -> str | None:
         async with self.conn.cursor() as cursor:
             kwargs.update(update.model_dump())
             await cursor.execute(query=query, params=kwargs)
@@ -47,22 +47,20 @@ class Database:
 
     async def _delete_resource(self, query: Query, **kwargs) -> None:
         async with self.conn.cursor() as cursor:
-            await cursor.execute(query=query, **kwargs)
+            await cursor.execute(query=query, params=kwargs)
 
     # User
 
-    async def get_user(self, id: UUID | str) -> User | None:
+    async def get_user(self, id: str) -> User | None:
         return await self._get_resource(query=get_user_stmt, model_class=User, id=id)
 
     async def insert_user(self, data: UserInput) -> str:
         return await self._insert_resource(query=insert_user_stmt, data=data)
 
-    async def update_user(
-        self, id: UUID | str, update: UserUpdate
-    ) -> UUID | str | None:
+    async def update_user(self, id: str | str, update: UserUpdate) -> str | None:
         return await self._update_resource(update_user_stmt, update, id=id)
 
-    async def delete_user(self, id: UUID | str) -> None:
+    async def delete_user(self, id: str) -> None:
         return await self._delete_resource(delete_user_stmt, id=id)
 
     # Order
