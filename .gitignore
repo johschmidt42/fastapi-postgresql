@@ -1,0 +1,10 @@
+dist
+*.egg
+*.egg-info
+.activate
+__pycache__
+.idea
+.DS_Store
+.ipynb_checkpoints
+.vscode
+.venv
