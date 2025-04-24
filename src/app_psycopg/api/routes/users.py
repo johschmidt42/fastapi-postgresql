@@ -1,11 +1,11 @@
 from typing import Annotated
 
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
+from fastapi import APIRouter, Body, Depends, status
 
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User, UserInput, UserUpdate
-from app_psycopg.api.dependencies import get_db
+from app_psycopg.api.dependencies import get_db, valid_user_id
 
 router: APIRouter = APIRouter(
     tags=["Users"],
@@ -25,22 +25,18 @@ async def create_user(
 
 @router.get(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def get_user(
-    db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[str, Path(...)],
+    user: Annotated[User, Depends(valid_user_id)],
 ) -> User:
-    user: None | User = await db.get_user(user_id)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return user
 
 
 @router.put(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def update_user(
     db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[str, Path(...)],
+    user: Annotated[User, Depends(valid_user_id)],
     update: Annotated[UserUpdate, Body(...)],
 ) -> User:
-    user_id: str = await db.update_user(user_id, update)
+    user_id: str = await db.update_user(id=user.id, update=update)
     return await db.get_user(user_id)
 
 
@@ -49,6 +45,6 @@ async def update_user(
 )
 async def delete_user(
     db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[str, Path(...)],
+    user: Annotated[User, Depends(valid_user_id)],
 ) -> None:
-    await db.delete_user(user_id)
+    await db.delete_user(user.id)
