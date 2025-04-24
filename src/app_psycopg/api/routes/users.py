@@ -1,11 +1,10 @@
-from typing import Annotated
+from typing import Annotated, List
 
+from fastapi import APIRouter, Body, Depends, status, Query
 
-from fastapi import APIRouter, Body, Depends, status
-
+from app_psycopg.api.dependencies import get_db, valid_user_id
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User, UserInput, UserUpdate
-from app_psycopg.api.dependencies import get_db, valid_user_id
 
 router: APIRouter = APIRouter(
     tags=["Users"],
@@ -28,6 +27,15 @@ async def get_user(
     user: Annotated[User, Depends(valid_user_id)],
 ) -> User:
     return user
+
+
+@router.get(path="", response_model=List[User], status_code=status.HTTP_200_OK)
+async def get_users(
+    db: Annotated[Database, Depends(get_db)],
+    limit: int = Query(default=10, ge=1),
+    offset: int = Query(default=0, ge=0),
+) -> List[User]:
+    return await db.get_users(limit=limit, offset=offset)
 
 
 @router.put(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)

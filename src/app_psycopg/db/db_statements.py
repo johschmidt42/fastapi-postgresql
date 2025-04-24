@@ -5,6 +5,10 @@ insert_user_stmt: LiteralString = """
     RETURNING id
 """
 
+get_users_stmt: LiteralString = """
+    SELECT * FROM users LIMIT %(limit)s OFFSET %(offset)s
+"""
+
 get_user_stmt: LiteralString = """
     SELECT * FROM users WHERE id = %(id)s
 """
