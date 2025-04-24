@@ -2,7 +2,7 @@ from typing import Annotated, List
 
 from fastapi import APIRouter, Body, Depends, status, Query
 
-from app_psycopg.api.dependencies import get_db, valid_user_id
+from app_psycopg.api.dependencies import get_db, validate_user_id
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User, UserInput, UserUpdate
 
@@ -24,7 +24,7 @@ async def create_user(
 
 @router.get(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def get_user(
-    user: Annotated[User, Depends(valid_user_id)],
+    user: Annotated[User, Depends(validate_user_id)],
 ) -> User:
     return user
 
@@ -41,7 +41,7 @@ async def get_users(
 @router.put(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def update_user(
     db: Annotated[Database, Depends(get_db)],
-    user: Annotated[User, Depends(valid_user_id)],
+    user: Annotated[User, Depends(validate_user_id)],
     update: Annotated[UserUpdate, Body(...)],
 ) -> User:
     user_id: str = await db.update_user(id=user.id, update=update)
@@ -53,6 +53,6 @@ async def update_user(
 )
 async def delete_user(
     db: Annotated[Database, Depends(get_db)],
-    user: Annotated[User, Depends(valid_user_id)],
+    user: Annotated[User, Depends(validate_user_id)],
 ) -> None:
     await db.delete_user(user.id)

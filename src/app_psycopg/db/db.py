@@ -1,4 +1,4 @@
-from typing import TypeVar, List
+from typing import TypeVar, List, LiteralString, Optional, cast
 
 from psycopg import AsyncConnection
 from psycopg.abc import Query
@@ -14,9 +14,26 @@ from app_psycopg.db.db_statements import (
     insert_user_stmt,
     update_user_stmt,
     get_users_stmt,
+    get_orders_stmt,
 )
 
 T: TypeVar = TypeVar("T")
+
+
+def create_paginate_query_from_text(
+    query: Query, limit: Optional[int], offset: Optional[int]
+) -> LiteralString:
+    suffix = ""
+    if limit is not None:
+        suffix += f" LIMIT {limit}"
+    if offset is not None:
+        suffix += f" OFFSET {offset}"
+
+    return cast(LiteralString, f"{query} {suffix}".strip())
+
+
+def create_count_query_from_text(query: str) -> str:
+    return f"SELECT count(*) FROM ({query}) AS __count_query__"
 
 
 class Database:
@@ -53,7 +70,12 @@ class Database:
         self, query: Query, model_class: type[T], **kwargs
     ) -> List[T]:
         async with self.conn.cursor(row_factory=class_row(cls=model_class)) as cursor:
-            await cursor.execute(query=query, params=kwargs)
+            await cursor.execute(
+                query=create_paginate_query_from_text(
+                    query=query, limit=kwargs.get("limit"), offset=kwargs.get("offset")
+                ),
+                params=kwargs,
+            )
             return await cursor.fetchall()
 
     # User
@@ -82,3 +104,8 @@ class Database:
 
     async def get_order(self, id: str) -> Order | None:
         return await self._get_resource(query=get_order_stmt, model_class=Order, id=id)
+
+    async def get_orders(self, **kwargs) -> List[Order]:
+        return await self._get_resources(
+            query=get_orders_stmt, model_class=Order, **kwargs
+        )

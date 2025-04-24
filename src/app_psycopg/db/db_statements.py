@@ -6,7 +6,7 @@ insert_user_stmt: LiteralString = """
 """
 
 get_users_stmt: LiteralString = """
-    SELECT * FROM users LIMIT %(limit)s OFFSET %(offset)s
+    SELECT * FROM users
 """
 
 get_user_stmt: LiteralString = """
@@ -36,4 +36,8 @@ get_order_stmt: LiteralString = """
     FROM orders t
     JOIN users u1 ON t.payer_id = u1.id
     JOIN users u2 ON t.payee_id = u2.id
+"""
+
+get_orders_stmt: LiteralString = """
+    SELECT * FROM orders
 """
