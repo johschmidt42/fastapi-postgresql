@@ -25,5 +25,4 @@ Go to [app_sqlalchemy](src/app_sqlalchemy)
 
 - [ ] Create erd diagram
 - [ ] SQLAlchemy app
-- [ ] Add filters, sorting, get, create, udpate, delete many function
-- [ ] Pagination
+- [ ] Add filters, sorting
