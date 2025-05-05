@@ -3,8 +3,9 @@ from typing import Annotated, List
 from fastapi import APIRouter, Body, Depends, status, Query
 
 from app_psycopg.api.dependencies import get_db, validate_user_id
+from app_psycopg.api.models import UserInput, UserUpdate, UserResponseModel
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User, UserInput, UserUpdate
+from app_psycopg.db.db_models import User
 
 router: APIRouter = APIRouter(
     tags=["Users"],
@@ -12,40 +13,46 @@ router: APIRouter = APIRouter(
 )
 
 
-@router.post(path="", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
 async def create_user(
     db: Annotated[Database, Depends(get_db)],
     user_input: Annotated[UserInput, Body(...)],
-) -> User:
+) -> str:
     user_id: str = await db.insert_user(user_input)
     user: User = await db.get_user(user_id)
-    return user
+    return user.id
 
 
-@router.get(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
+@router.get(
+    path="/{user_id}", response_model=UserResponseModel, status_code=status.HTTP_200_OK
+)
 async def get_user(
     user: Annotated[User, Depends(validate_user_id)],
-) -> User:
-    return user
+) -> UserResponseModel:
+    return UserResponseModel.model_validate(user)
 
 
-@router.get(path="", response_model=List[User], status_code=status.HTTP_200_OK)
+@router.get(
+    path="", response_model=List[UserResponseModel], status_code=status.HTTP_200_OK
+)
 async def get_users(
     db: Annotated[Database, Depends(get_db)],
     limit: int = Query(default=10, ge=1),
     offset: int = Query(default=0, ge=0),
-) -> List[User]:
-    return await db.get_users(limit=limit, offset=offset)
+) -> List[UserResponseModel]:
+    users: List[User] = await db.get_users(limit=limit, offset=offset)
+    return [UserResponseModel.model_validate(user) for user in users]
 
 
-@router.put(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
+@router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)
 async def update_user(
     db: Annotated[Database, Depends(get_db)],
     user: Annotated[User, Depends(validate_user_id)],
     update: Annotated[UserUpdate, Body(...)],
-) -> User:
+) -> str:
     user_id: str = await db.update_user(id=user.id, update=update)
-    return await db.get_user(user_id)
+    user: User = await db.get_user(user_id)
+    return user.id
 
 
 @router.delete(

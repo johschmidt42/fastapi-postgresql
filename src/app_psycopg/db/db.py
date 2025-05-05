@@ -5,7 +5,8 @@ from psycopg.abc import Query
 from psycopg.rows import class_row
 from pydantic import BaseModel
 
-from app_psycopg.db.db_models import Order, OrderInput, User, UserInput, UserUpdate
+from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
+from app_psycopg.db.db_models import Order, User
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
     get_order_stmt,

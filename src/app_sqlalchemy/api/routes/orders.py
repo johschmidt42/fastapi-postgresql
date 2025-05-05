@@ -12,7 +12,9 @@ router: APIRouter = APIRouter(
 )
 
 
-@router.post(path="", response_model=OrderResponseModel, status_code=status.HTTP_201_CREATED)
+@router.post(
+    path="", response_model=OrderResponseModel, status_code=status.HTTP_201_CREATED
+)
 async def create_order(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
     order_input: OrderInput = Depends(validate_order_input),

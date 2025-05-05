@@ -32,7 +32,8 @@ async def validate_user_id(
 
 
 async def validate_order_input(
-    session: Annotated[AsyncSession, Depends(get_db_session)], order_input: Annotated[OrderInput, Body(...)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    order_input: Annotated[OrderInput, Body(...)],
 ) -> OrderInput:
     # Validate payer_id
     await validate_user_id(session=session, user_id=order_input.payer_id)

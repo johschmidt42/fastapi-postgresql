@@ -4,8 +4,9 @@ from fastapi import Depends, Request, HTTPException, Body
 from psycopg import Connection, AsyncConnection
 from starlette import status
 
+from app_psycopg.api.models import OrderInput
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User, OrderInput
+from app_psycopg.db.db_models import User
 
 
 async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:

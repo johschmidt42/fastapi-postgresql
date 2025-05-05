@@ -15,7 +15,7 @@ router: APIRouter = APIRouter(
 )
 
 
-@router.post(path="", status_code=status.HTTP_201_CREATED)
+@router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
 async def create_user(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
     user_input: Annotated[UserInput, Body(...)],
@@ -30,20 +30,6 @@ async def create_user(
 
     return user_input.id
 
-@router.get(path="", response_model=List[UserResponseModel], status_code=status.HTTP_200_OK)
-async def get_users(
-    db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: int = Query(default=10, ge=1),
-    offset: int = Query(default=0, ge=0),
-) -> List[UserResponseModel]:
-
-    query: Select = select(User).limit(limit).offset(offset)
-
-    result: Result = await db_session.execute(query)
-
-    users: Sequence[Row | RowMapping | Any] = result.scalars().all()
-
-    return [UserResponseModel.model_validate(user) for user in users]
 
 @router.get(
     path="/{user_id}", response_model=UserResponseModel, status_code=status.HTTP_200_OK
@@ -54,9 +40,24 @@ async def get_user(
     return UserResponseModel.model_validate(user)
 
 
-# get users
+@router.get(
+    path="", response_model=List[UserResponseModel], status_code=status.HTTP_200_OK
+)
+async def get_users(
+    db_session: Annotated[AsyncSession, Depends(get_db_session)],
+    limit: int = Query(default=10, ge=1),
+    offset: int = Query(default=0, ge=0),
+) -> List[UserResponseModel]:
+    query: Select = select(User).limit(limit).offset(offset)
 
-@router.put(path="/{user_id}", status_code=status.HTTP_200_OK)
+    result: Result = await db_session.execute(query)
+
+    users: Sequence[Row | RowMapping | Any] = result.scalars().all()
+
+    return [UserResponseModel.model_validate(user) for user in users]
+
+
+@router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)
 async def update_user(
     user: Annotated[User, Depends(validate_user_id)],
     update: Annotated[UserUpdate, Body(...)],
@@ -65,6 +66,7 @@ async def update_user(
     user.last_updated_at = update.last_updated_at
 
     return user.id
+
 
 @router.delete(
     path="/{user_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT

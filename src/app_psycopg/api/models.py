@@ -1,8 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from pydantic import BaseModel, computed_field
-from pydantic import ConfigDict
+from pydantic import BaseModel, computed_field, ConfigDict
 
 
 class UserInput(BaseModel):
