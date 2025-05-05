@@ -23,4 +23,4 @@ async def create_order(
     order_id: str = await db.insert_order(order_input)
     order: Order = await db.get_order(order_id)
 
-    return order
+    return OrderResponseModel.model_validate(order)
