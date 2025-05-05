@@ -1,9 +1,10 @@
 from typing import AsyncGenerator, Annotated
 
-from fastapi import Request, Depends, HTTPException
+from fastapi import Request, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from starlette import status
 
+from app_sqlalchemy.api.models import OrderInput
 from app_sqlalchemy.db.db_models import User
 
 
@@ -28,3 +29,14 @@ async def validate_user_id(
         )
 
     return user
+
+
+async def validate_order_input(
+    session: Annotated[AsyncSession, Depends(get_db_session)], order_input: Annotated[OrderInput, Body(...)],
+) -> OrderInput:
+    # Validate payer_id
+    await validate_user_id(session=session, user_id=order_input.payer_id)
+    # Validate payee_id
+    await validate_user_id(session=session, user_id=order_input.payee_id)
+
+    return order_input

@@ -29,3 +29,18 @@ class UserResponseModel(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class OrderInput(BaseModel):
+    amount: float
+    payer_id: str
+    payee_id: str
+
+    @computed_field
+    def id(self) -> str:
+        return uuid4().hex
+
+class OrderResponseModel(BaseModel):
+    id: str
+    amount: float
+    payer: UserResponseModel
+    payee: UserResponseModel
