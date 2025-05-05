@@ -28,7 +28,7 @@ async def create_user(
 
     db_session.add(new_user)
 
-    return user_input.id
+    return new_user.id
 
 
 @router.get(
