@@ -1,12 +1,17 @@
 # FastAPI & PostgreSQL
 
-- FastAPI with psycopg (async)
-- FastAPI with asyncpg (async)
-- FastAPI with SQLAlchemy (async)
+[FastAPI](https://fastapi.tiangolo.com/) typically connects to an SQL database
+like [PostgreSQL](https://www.postgresql.org/), a powerful and widely used choice.
+This repository demonstrates how to integrate these popular async libraries into FastAPI efficiently:
 
-Automatic commits & rollbacks using FastAPI's dependency injection system.
+- [psycopg3](https://www.psycopg.org/psycopg3/docs/) (async)
+- [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/) (async)
 
-Interesting comparison between psycopg & asyncpg: https://fernandoarteaga.dev/blog/psycopg-vs-asyncpg/
+**Features**:
+
+- Automatic commits & rollbacks using FastAPI's dependency injection system.
+- Basic limit offset pagination.
+- Unit tests.
 
 ## Getting started
 
@@ -18,29 +23,32 @@ make start-db
 
 - Create the tables by executing the SQL statements in [db/schema.sql](db/schema.sql).
 
+![schema.png](docs/schema.png)
+
 ### FastAPI with psycopg
 
 Go to [app_psycopg](src/app_psycopg)
+
+##Resources**:
+
+- https://blog.danielclayton.co.uk/posts/database-connections-with-fastapi/
 
 ### FastAPI with SQLAlchemy (async)
 
 Go to [app_sqlalchemy](src/app_sqlalchemy)
 
-Based on https://chaoticengineer.hashnode.dev/fastapi-sqlalchemy
+**Resources**:
 
-Other resources:
-
+- https://chaoticengineer.hashnode.dev/fastapi-sqlalchemy
 - https://medium.com/@tclaitken/setting-up-a-fastapi-app-with-async-sqlalchemy-2-0-pydantic-v2-e6c540be4308
 - https://medium.com/@navinsharma9376319931/mastering-fastapi-crud-operations-with-async-sqlalchemy-and-postgresql-3189a28d06a2
 - https://github.com/ThomasAitken/demo-fastapi-async-sqlalchemy/tree/main
 
-### FastAPI with asyncpg
+## Other Resources
 
-Go to [app_asyncpg](src/app_asyncpg)
+- Comparison between psycopg & asyncpg: https://fernandoarteaga.dev/blog/psycopg-vs-asyncpg/
 
 ## TODO
 
-- [ ] Create erd diagram
-- [ ] SQLAlchemy app
 - [ ] Add filters, sorting
-- [ ] Automatic commit/Rollback
+- [ ] Add unit tests
