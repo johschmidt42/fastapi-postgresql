@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, Request, HTTPException, Body
@@ -30,13 +31,20 @@ async def validate_user_id(
     return user
 
 
+@dataclass(frozen=True)
+class ValidatedOrder:
+    order_input: OrderInput
+    payer: User
+    payee: User
+
+
 async def validate_order_input(
     db: Annotated[Database, Depends(get_db)],
     order_input: Annotated[OrderInput, Body(...)],
-) -> OrderInput:
+) -> ValidatedOrder:
     # Validate payer_id
-    await validate_user_id(db=db, user_id=order_input.payer_id)
+    payer: User = await validate_user_id(db=db, user_id=order_input.payer_id)
     # Validate payee_id
-    await validate_user_id(db=db, user_id=order_input.payee_id)
+    payee: User = await validate_user_id(db=db, user_id=order_input.payee_id)
 
-    return order_input
+    return ValidatedOrder(order_input=order_input, payer=payer, payee=payee)

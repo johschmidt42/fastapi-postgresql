@@ -47,3 +47,5 @@ class OrderResponseModel(BaseModel):
     amount: float
     payer: UserResponseModel
     payee: UserResponseModel
+
+    model_config = ConfigDict(from_attributes=True)

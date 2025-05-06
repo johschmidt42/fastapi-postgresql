@@ -6,6 +6,7 @@ from starlette import status
 
 from app_sqlalchemy.api.models import OrderInput
 from app_sqlalchemy.db.db_models import User
+from dataclasses import dataclass
 
 
 async def get_db_connection(request: Request) -> AsyncGenerator[AsyncConnection, None]:
@@ -31,13 +32,20 @@ async def validate_user_id(
     return user
 
 
+@dataclass(frozen=True)
+class ValidatedOrder:
+    order_input: OrderInput
+    payer: User
+    payee: User
+
+
 async def validate_order_input(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     order_input: Annotated[OrderInput, Body(...)],
-) -> OrderInput:
+) -> ValidatedOrder:
     # Validate payer_id
-    await validate_user_id(session=session, user_id=order_input.payer_id)
+    payer: User = await validate_user_id(session=session, user_id=order_input.payer_id)
     # Validate payee_id
-    await validate_user_id(session=session, user_id=order_input.payee_id)
+    payee: User = await validate_user_id(session=session, user_id=order_input.payee_id)
 
-    return order_input
+    return ValidatedOrder(order_input=order_input, payer=payer, payee=payee)

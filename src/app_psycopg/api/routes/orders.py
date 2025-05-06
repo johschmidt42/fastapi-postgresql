@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
-from app_psycopg.api.dependencies import get_db, validate_order_input
-from app_psycopg.api.models import OrderInput, OrderResponseModel
+from app_psycopg.api.dependencies import get_db, validate_order_input, ValidatedOrder
+from app_psycopg.api.models import OrderResponseModel
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import Order
 
@@ -18,9 +18,9 @@ router: APIRouter = APIRouter(
 )
 async def create_order(
     db: Annotated[Database, Depends(get_db)],
-    order_input: OrderInput = Depends(validate_order_input),
+    validated_order_input: ValidatedOrder = Depends(validate_order_input),
 ) -> OrderResponseModel:
-    order_id: str = await db.insert_order(order_input)
+    order_id: str = await db.insert_order(validated_order_input.order_input)
     order: Order = await db.get_order(order_id)
 
     return OrderResponseModel.model_validate(order)
