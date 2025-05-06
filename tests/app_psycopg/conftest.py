@@ -7,6 +7,7 @@ from polyfactory.factories.pydantic_factory import ModelFactory
 
 from app_psycopg.api.app import app as psycopg_app
 from app_psycopg.api.dependencies import get_conn, get_db
+from app_psycopg.api.models import UserResponseModel, OrderResponseModel
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User, Order
 
@@ -15,17 +16,16 @@ class UserFactory(ModelFactory[User]):
     __model__ = User
 
 
+class UserResponseFactory(ModelFactory[UserResponseModel]):
+    __model__ = UserResponseModel
+
+
 class OrderFactory(ModelFactory[Order]):
     __model__ = Order
 
-    @classmethod
-    def build(cls, **kwargs):
-        """Build an Order instance with proper User objects for payer and payee."""
-        if "payer" not in kwargs:
-            kwargs["payer"] = UserFactory.build()
-        if "payee" not in kwargs:
-            kwargs["payee"] = UserFactory.build()
-        return super().build(**kwargs)
+
+class OrderResponseFactory(ModelFactory[OrderResponseModel]):
+    __model__ = OrderResponseModel
 
 
 @pytest.fixture

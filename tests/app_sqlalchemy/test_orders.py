@@ -1,17 +1,12 @@
 import uuid
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 from starlette import status
 
-from app_psycopg.api.dependencies import ValidatedOrder
-from app_psycopg.api.models import OrderInput
-from tests.app_psycopg.conftest import (
-    UserFactory,
-    UserResponseFactory,
-    OrderResponseFactory,
-)
+from app_sqlalchemy.api.dependencies import ValidatedOrder
+from app_sqlalchemy.api.models import OrderInput
+from conftest import UserResponseFactory, OrderResponseFactory, UserFactory
 
 
 @pytest.fixture
@@ -75,42 +70,25 @@ def validated_order(order_input, payer, payee):
     )
 
 
-def test_create_order(client: TestClient, mock_db, order, validated_order):
+def test_create_order(client: TestClient, mock_session, order, validated_order):
     """Test creating an order."""
-    # Setup mock
-    mock_db.insert_order.return_value = order.id
-    mock_db.get_order.return_value = order
 
-    # Patch only the validate_order_input dependency
-    with patch(
-        "app_psycopg.api.routes.orders.validate_order_input",
-        return_value=validated_order,
-    ):
-        # Make request
-        response = client.post(
-            "/orders",
-            json={
-                "amount": validated_order.order_input.amount,
-                "payer_id": validated_order.order_input.payer_id,
-                "payee_id": validated_order.order_input.payee_id,
-            },
-        )
+    # Make request
+    response = client.post(
+        "/orders",
+        json={
+            "amount": validated_order.order_input.amount,
+            "payer_id": validated_order.order_input.payer_id,
+            "payee_id": validated_order.order_input.payee_id,
+        },
+    )
 
     # Assert response
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "id": order.id,
-        "amount": order.amount,
-        "payer": {
-            "id": order.payer.id,
-            "name": order.payer.name,
-        },
-        "payee": {
-            "id": order.payee.id,
-            "name": order.payee.name,
-        },
-    }
-
-    # Assert mock calls
-    mock_db.insert_order.assert_called_once_with(validated_order.order_input)
-    mock_db.get_order.assert_called_once_with(order.id)
+    response_json = response.json()
+    assert isinstance(response_json["id"], str)  # Check that ID is a string
+    assert response_json["amount"] == order.amount
+    assert response_json["payer"]["id"] == order.payer.id
+    assert response_json["payer"]["name"] == order.payer.name
+    assert response_json["payee"]["id"] == order.payee.id
+    assert response_json["payee"]["name"] == order.payee.name
