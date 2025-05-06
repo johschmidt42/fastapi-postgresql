@@ -3,15 +3,24 @@ from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
+from polyfactory.factories.pydantic_factory import ModelFactory
 from starlette import status
 
 from app_psycopg.api.dependencies import ValidatedOrder
-from app_psycopg.api.models import OrderInput
-from tests.app_psycopg.conftest import (
-    UserFactory,
-    UserResponseFactory,
-    OrderResponseFactory,
-)
+from app_psycopg.api.models import OrderInput, UserResponseModel, OrderResponseModel
+from app_psycopg.db.db_models import User
+
+
+class UserFactory(ModelFactory[User]):
+    __model__ = User
+
+
+class UserResponseFactory(ModelFactory[UserResponseModel]):
+    __model__ = UserResponseModel
+
+
+class OrderResponseFactory(ModelFactory[OrderResponseModel]):
+    __model__ = OrderResponseModel
 
 
 @pytest.fixture

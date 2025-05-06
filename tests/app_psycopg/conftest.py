@@ -3,29 +3,10 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
-from polyfactory.factories.pydantic_factory import ModelFactory
 
 from app_psycopg.api.app import app as psycopg_app
 from app_psycopg.api.dependencies import get_conn, get_db
-from app_psycopg.api.models import UserResponseModel, OrderResponseModel
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User, Order
-
-
-class UserFactory(ModelFactory[User]):
-    __model__ = User
-
-
-class UserResponseFactory(ModelFactory[UserResponseModel]):
-    __model__ = UserResponseModel
-
-
-class OrderFactory(ModelFactory[Order]):
-    __model__ = Order
-
-
-class OrderResponseFactory(ModelFactory[OrderResponseModel]):
-    __model__ = OrderResponseModel
 
 
 @pytest.fixture

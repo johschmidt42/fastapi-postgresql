@@ -21,32 +21,18 @@ regarding dependency injection.
 
 1. **Dependency Injection**: We use dependency overrides to replace database connections with mocks.
 2. **Polyfactory**: We use [polyfactory](https://github.com/litestar-org/polyfactory) to generate test data for Pydantic
-   models.
+   models & SQLAlchemy tables.
 
 ## Running Tests
 
 To run the tests, use pytest:
 
 ```bash
-# Run all tests
-pytest
-
-# Run tests for a specific application
-pytest tests/app_psycopg/
-pytest tests/app_sqlalchemy/
-
-# Run tests with coverage
-pytest --cov=src
+# Run tests for a the psycopg app
+pytest app_psycopg
 ```
 
-## Test Files
-
-### app_psycopg
-
-- `test_users.py`: Tests for user endpoints (create, get, update, delete)
-- `test_orders.py`: Tests for order endpoints (create)
-
-### app_sqlalchemy
-
-- `test_users.py`: Tests for user endpoints (create, get, update, delete)
-- `test_orders.py`: Tests for order endpoints (create)
+```bash
+# Run tests for a the sqlalchemy app
+pytest app_sqlalchemy
+```

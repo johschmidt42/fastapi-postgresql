@@ -1,14 +1,23 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from polyfactory.factories.pydantic_factory import ModelFactory
+
 from app_psycopg.db.db import (
     Database,
     create_paginate_query_from_text,
     create_count_query_from_text,
 )
 from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
-from app_psycopg.db.db_models import User
-from tests.app_psycopg.conftest import UserFactory, OrderFactory
+from app_psycopg.db.db_models import User, Order
+
+
+class UserFactory(ModelFactory[User]):
+    __model__ = User
+
+
+class OrderFactory(ModelFactory[Order]):
+    __model__ = Order
 
 
 @pytest.mark.asyncio
