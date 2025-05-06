@@ -2,7 +2,7 @@
 
 [FastAPI](https://fastapi.tiangolo.com/) typically connects to an SQL database
 like [PostgreSQL](https://www.postgresql.org/), a powerful and widely used choice.
-This repository demonstrates how to integrate these popular async libraries into FastAPI efficiently:
+This repository demonstrates how to integrate 2 popular **async PostgreSQL libraries** into FastAPI efficiently:
 
 - [psycopg3](https://www.psycopg.org/psycopg3/docs/) (async)
 - [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/) (async)
