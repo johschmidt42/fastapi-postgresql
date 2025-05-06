@@ -10,7 +10,7 @@ app: FastAPI = FastAPI(lifespan=lifespan)
 app.include_router(router=users.router)
 app.include_router(router=orders.router)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import uvicorn
 
     port: int = os.environ["PORT"] if os.environ.get("PORT") else 9000
