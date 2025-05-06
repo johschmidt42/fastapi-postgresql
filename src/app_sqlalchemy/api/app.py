@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI
 
-from lifespan import lifespan
+from app_sqlalchemy.api.lifespan import lifespan
 from app_sqlalchemy.api.routes import users
 from app_sqlalchemy.api.routes import orders
 

@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI
 
-from lifespan import lifespan
+from app_psycopg.api.lifespan import lifespan
 from app_psycopg.api.routes import users
 from app_psycopg.api.routes import orders
 
