@@ -29,7 +29,7 @@ make start-db
 
 Go to [app_psycopg](src/app_psycopg)
 
-##Resources**:
+**Resources**:
 
 - https://blog.danielclayton.co.uk/posts/database-connections-with-fastapi/
 
