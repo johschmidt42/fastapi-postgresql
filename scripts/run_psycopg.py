@@ -4,8 +4,9 @@ from typing import Optional
 from psycopg import AsyncConnection
 from psycopg.conninfo import make_conninfo
 
+from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import OrderInput, User, UserInput, Order, UserUpdate
+from app_psycopg.db.db_models import User, Order
 
 
 async def main(conn_info: str) -> None:

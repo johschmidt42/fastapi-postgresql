@@ -42,7 +42,7 @@ format:  ## format code using ruff
 
 ##@ Linting
 
-lint-py:  ## run linter using ruff
+lint:  ## run linter using ruff
 	@ruff format . --check
 	@ruff check .
 
