@@ -54,12 +54,6 @@ def mock_session():
     """Create a mock AsyncSession for testing."""
     mock = AsyncMock()
 
-    # Mock the get method to return a User created by UserFactory
-    async def mock_get(model_class, id_value):
-        if model_class == User:
-            return UserFactory.build(id=id_value, name="Test User")
-        return None
-
     # Mock the execute method to return a result with users
     async def mock_execute(query):
         class MockScalars:
@@ -73,7 +67,6 @@ def mock_session():
         return MockResult()
 
     # Set up the mock methods
-    mock.get = mock_get
     mock.execute = mock_execute
     mock.add = MagicMock()
     mock.delete = AsyncMock()
