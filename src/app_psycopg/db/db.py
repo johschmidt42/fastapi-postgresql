@@ -5,8 +5,14 @@ from psycopg.abc import Query
 from psycopg.rows import class_row
 from pydantic import BaseModel
 
-from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
-from app_psycopg.db.db_models import Order, User
+from app_psycopg.api.models import (
+    UserInput,
+    UserUpdate,
+    OrderInput,
+    DocumentInput,
+    DocumentUpdate,
+)
+from app_psycopg.db.db_models import Order, User, Document
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
     get_order_stmt,
@@ -16,6 +22,11 @@ from app_psycopg.db.db_statements import (
     update_user_stmt,
     get_users_stmt,
     get_orders_stmt,
+    get_document_stmt,
+    get_documents_stmt,
+    insert_document_stmt,
+    document_user_stmt,
+    delete_document_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -110,3 +121,28 @@ class Database:
         return await self._get_resources(
             query=get_orders_stmt, model_class=Order, **kwargs
         )
+
+    # Documents
+
+    async def insert_document(self, data: DocumentInput) -> str:
+        return await self._insert_resource(query=insert_document_stmt, data=data)
+
+    async def update_document(
+        self, id: str | str, update: DocumentUpdate
+    ) -> str | None:
+        return await self._update_resource(
+            query=document_user_stmt, update=update, id=id
+        )
+
+    async def get_document(self, id: str) -> Document | None:
+        return await self._get_resource(
+            query=get_document_stmt, model_class=Document, id=id
+        )
+
+    async def get_documents(self, **kwargs) -> List[Document]:
+        return await self._get_resources(
+            query=get_documents_stmt, model_class=Document, **kwargs
+        )
+
+    async def delete_document(self, id: str) -> None:
+        return await self._delete_resource(delete_document_stmt, id=id)

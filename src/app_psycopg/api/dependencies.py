@@ -7,7 +7,7 @@ from starlette import status
 
 from app_psycopg.api.models import OrderInput
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User
+from app_psycopg.db.db_models import User, Document
 
 
 async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
@@ -29,6 +29,18 @@ async def validate_user_id(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"User '{user_id}' not found!"
         )
     return user
+
+
+async def validate_document_id(
+    db: Annotated[Database, Depends(get_db)], document_id: str
+) -> Document:
+    document: Document | None = await db.get_document(document_id)
+    if document is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document '{document_id}' not found!",
+        )
+    return document
 
 
 @dataclass(frozen=True)

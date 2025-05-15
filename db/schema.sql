@@ -14,3 +14,11 @@ CREATE TABLE IF NOT EXISTS orders
     payer_id CHAR(32) REFERENCES users (id) NOT NULL,
     payee_id CHAR(32) REFERENCES users (id) NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS documents (
+    id CHAR(32) PRIMARY KEY,
+    document JSONB,
+    created_at TIMESTAMP NOT NULL,
+    last_updated_at TIMESTAMP
+);

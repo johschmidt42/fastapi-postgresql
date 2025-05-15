@@ -41,3 +41,26 @@ get_order_stmt: LiteralString = """
 get_orders_stmt: LiteralString = """
     SELECT * FROM orders
 """
+
+insert_document_stmt: LiteralString = """
+    INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)
+    RETURNING id
+"""
+
+get_document_stmt: LiteralString = """
+    SELECT * FROM documents WHERE id = %(id)s
+"""
+
+get_documents_stmt: LiteralString = """
+    SELECT * FROM documents
+"""
+
+document_user_stmt: LiteralString = """
+    UPDATE documents SET (document, last_updated_at) = (%(document)s, %(last_updated_at)s)
+    WHERE id = %(id)s
+    RETURNING id
+"""
+
+delete_document_stmt: LiteralString = """
+    DELETE FROM documents WHERE id = %(id)s
+"""

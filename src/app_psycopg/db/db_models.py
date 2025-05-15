@@ -11,3 +11,8 @@ class Order(BaseModel):
     amount: float
     payer: User
     payee: User
+
+
+class Document(BaseModel):
+    id: str
+    document: dict
