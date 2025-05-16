@@ -8,11 +8,12 @@ from app_sqlalchemy.api.dependencies import (
     get_db_session,
     validate_user_id,
     validate_order_input,
+    validate_document_id,
     ValidatedOrder,
 )
 from app_sqlalchemy.api.models import OrderInput
-from app_sqlalchemy.db.db_models import User
-from conftest import UserFactory
+from app_sqlalchemy.db.db_models import User, Document
+from tests.app_sqlalchemy.conftest import UserFactory, DocumentFactory
 
 
 class AsyncContextManagerMock:
@@ -109,6 +110,40 @@ async def test_validate_user_id_not_found():
     assert exc_info.value.status_code == 404
     assert f"User '{user_id}' not found!" in exc_info.value.detail
     session.get.assert_called_once_with(User, user_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_document_id_success():
+    """Test validate_document_id when document exists."""
+    # Arrange
+    session = AsyncMock()
+    document_id = "test-document-id"
+    document = DocumentFactory.build(id=document_id)
+    session.get.return_value = document
+
+    # Act
+    result = await validate_document_id(session=session, document_id=document_id)
+
+    # Assert
+    assert result == document
+    session.get.assert_called_once_with(Document, document_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_document_id_not_found():
+    """Test validate_document_id when document does not exist."""
+    # Arrange
+    session = AsyncMock()
+    document_id = "non-existent-document-id"
+    session.get.return_value = None
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_document_id(session=session, document_id=document_id)
+
+    assert exc_info.value.status_code == 404
+    assert f"Document '{document_id}' not found!" in exc_info.value.detail
+    session.get.assert_called_once_with(Document, document_id)
 
 
 @pytest.mark.asyncio

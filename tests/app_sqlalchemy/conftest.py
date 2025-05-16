@@ -1,5 +1,6 @@
 from typing import Annotated
 from unittest.mock import AsyncMock, MagicMock
+from datetime import datetime
 
 import pytest
 from fastapi import FastAPI, Depends, Body
@@ -13,10 +14,16 @@ from app_sqlalchemy.api.dependencies import (
     get_db_session,
     validate_user_id,
     validate_order_input,
+    validate_document_id,
     ValidatedOrder,
 )
-from app_sqlalchemy.api.models import UserResponseModel, OrderResponseModel, OrderInput
-from app_sqlalchemy.db.db_models import User
+from app_sqlalchemy.api.models import (
+    UserResponseModel,
+    OrderResponseModel,
+    OrderInput,
+    DocumentResponseModel,
+)
+from app_sqlalchemy.db.db_models import User, Document
 
 
 class UserResponseFactory(ModelFactory[UserResponseModel]):
@@ -27,8 +34,16 @@ class OrderResponseFactory(ModelFactory[OrderResponseModel]):
     __model__ = OrderResponseModel
 
 
+class DocumentResponseFactory(ModelFactory[DocumentResponseModel]):
+    __model__ = DocumentResponseModel
+
+
 class UserFactory(SQLAlchemyFactory[User]):
     __model__ = User
+
+
+class DocumentFactory(SQLAlchemyFactory[Document]):
+    __model__ = Document
 
 
 @pytest.fixture
@@ -50,14 +65,31 @@ def order_response():
 
 
 @pytest.fixture
+def document_response():
+    """Create a DocumentResponseModel for testing."""
+    return DocumentResponseFactory.build(document={"key": "value"})
+
+
+@pytest.fixture
 def mock_session():
     """Create a mock AsyncSession for testing."""
     mock = AsyncMock()
 
-    # Mock the execute method to return a result with users
+    # Mock the execute method to return a result with users or documents
     async def mock_execute(query):
         class MockScalars:
             def all(self):
+                query_str = str(query)
+                # Check if the query is for documents or users based on the query string
+                if "Document" in query_str or "documents" in query_str:
+                    return [
+                        DocumentFactory.build(
+                            id="test-doc-id",
+                            document={"key": "value"},
+                            created_at=datetime.now(),
+                        )
+                    ]
+                # Default to returning User objects for all other queries
                 return [UserFactory.build(id="test-id")]
 
         class MockResult:
@@ -75,7 +107,9 @@ def mock_session():
 
 
 @pytest.fixture
-def client(app: FastAPI, mock_session, user_response, order_response) -> TestClient:
+def client(
+    app: FastAPI, mock_session, user_response, order_response, document_response
+) -> TestClient:
     """Get test client for FastAPI application with mocked dependencies."""
 
     # Override the get_db_session dependency
@@ -85,6 +119,14 @@ def client(app: FastAPI, mock_session, user_response, order_response) -> TestCli
     # Override the validate_user_id dependency
     async def override_validate_user_id(user_id: str):
         return UserFactory.build(id=user_id, name=user_response.name)
+
+    # Override the validate_document_id dependency
+    async def override_validate_document_id(document_id: str):
+        return DocumentFactory.build(
+            id=document_id,
+            document=document_response.document,
+            created_at=datetime.now(),
+        )
 
     # Override the validate_order_input dependency
     async def override_validate_order_input(
@@ -98,6 +140,7 @@ def client(app: FastAPI, mock_session, user_response, order_response) -> TestCli
 
     app.dependency_overrides[get_db_session] = override_get_db_session
     app.dependency_overrides[validate_user_id] = override_validate_user_id
+    app.dependency_overrides[validate_document_id] = override_validate_document_id
     app.dependency_overrides[validate_order_input] = override_validate_order_input
 
     with TestClient(app) as test_client:
