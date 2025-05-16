@@ -49,7 +49,7 @@ async def get_documents(
     offset: int = Query(default=0, ge=0),
 ) -> LimitOffsetPage[DocumentResponseModel]:
     documents: List[Document] = await db.get_documents(limit=limit, offset=offset)
-    total: int = await db.get_documents_count() if documents else 0
+    total: int = await db.get_documents_count()
 
     items: List[DocumentResponseModel] = [
         DocumentResponseModel.model_validate(document) for document in documents
@@ -57,7 +57,8 @@ async def get_documents(
 
     return LimitOffsetPage(
         items=items,
-        total=total,
+        items_count=len(items),
+        total_count=total,
         limit=limit,
         offset=offset,
     )

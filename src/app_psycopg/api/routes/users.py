@@ -44,7 +44,7 @@ async def get_users(
     offset: int = Query(default=0, ge=0),
 ) -> LimitOffsetPage[UserResponseModel]:
     users: List[User] = await db.get_users(limit=limit, offset=offset)
-    total: int = await db.get_users_count() if users else 0
+    total: int = await db.get_users_count()
 
     items: List[UserResponseModel] = [
         UserResponseModel.model_validate(user) for user in users
@@ -52,7 +52,8 @@ async def get_users(
 
     return LimitOffsetPage(
         items=items,
-        total=total,
+        items_count=len(items),
+        total_count=total,
         limit=limit,
         offset=offset,
     )
