@@ -1,8 +1,14 @@
 import json
 from datetime import datetime
+from typing import List, Type, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, computed_field, ConfigDict, field_serializer
+
+from app_psycopg.api.sorting import create_order_by_options
+
+
+# User
 
 
 class UserInput(BaseModel):
@@ -28,8 +34,17 @@ class UserUpdate(BaseModel):
 class UserResponseModel(BaseModel):
     id: str
     name: str
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+OrderByUserOptions: Type = List[
+    create_order_by_options(["name", "created_at", "last_updated_at"])
+]
+
+# Order
 
 
 class OrderInput(BaseModel):
@@ -49,6 +64,9 @@ class OrderResponseModel(BaseModel):
     payee: UserResponseModel
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# Document
 
 
 class DocumentInput(BaseModel):
@@ -82,5 +100,12 @@ class DocumentUpdate(BaseModel):
 class DocumentResponseModel(BaseModel):
     id: str
     document: dict
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+OrderByDocumentOptions: Type = List[
+    create_order_by_options(["created_at", "updated_at"])
+]

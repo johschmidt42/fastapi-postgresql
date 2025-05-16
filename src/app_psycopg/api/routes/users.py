@@ -1,9 +1,14 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, Body, Depends, status, Query
 
 from app_psycopg.api.dependencies import get_db, validate_user_id
-from app_psycopg.api.models import UserInput, UserUpdate, UserResponseModel
+from app_psycopg.api.models import (
+    UserInput,
+    UserUpdate,
+    UserResponseModel,
+    OrderByUserOptions,
+)
 from app_psycopg.api.pagination import LimitOffsetPage
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User
@@ -42,8 +47,11 @@ async def get_users(
     db: Annotated[Database, Depends(get_db)],
     limit: int = Query(default=10, ge=1),
     offset: int = Query(default=0, ge=0),
+    order_by: Optional[OrderByUserOptions] = Query(None),
 ) -> LimitOffsetPage[UserResponseModel]:
-    users: List[User] = await db.get_users(limit=limit, offset=offset)
+    users: List[User] = await db.get_users(
+        limit=limit, offset=offset, order_by=order_by
+    )
     total: int = await db.get_users_count()
 
     items: List[UserResponseModel] = [
