@@ -51,4 +51,3 @@ Go to [app_sqlalchemy](src/app_sqlalchemy)
 ## TODO
 
 - [ ] Add filters, sorting
-- [ ] Add example for JSON
