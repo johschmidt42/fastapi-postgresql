@@ -12,7 +12,7 @@ from app_psycopg.api.models import (
     DocumentInput,
     DocumentUpdate,
 )
-from app_psycopg.api.pagination import create_paginate_query_from_text
+from app_psycopg.api.pagination import create_paginate_query
 from app_psycopg.db.db_models import Order, User, Document
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
@@ -30,6 +30,7 @@ from app_psycopg.db.db_statements import (
     document_user_stmt,
     delete_document_stmt,
     get_documents_count_stmt,
+    get_orders_count_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -70,9 +71,7 @@ class Database:
     ) -> List[T]:
         async with self.conn.cursor(row_factory=class_row(cls=model_class)) as cursor:
             await cursor.execute(
-                query=create_paginate_query_from_text(
-                    query=query, limit=kwargs.get("limit"), offset=kwargs.get("offset")
-                ),
+                query=query,
                 params=kwargs,
             )
             return await cursor.fetchall()
@@ -86,9 +85,14 @@ class Database:
     # User
 
     async def get_users(self, **kwargs) -> List[User]:
-        return await self._get_resources(
-            query=get_users_stmt, model_class=User, **kwargs
-        )
+        query: Query = get_users_stmt
+
+        if "limit" in kwargs and "offset" in kwargs:
+            query: Query = create_paginate_query(
+                query=query, limit=kwargs["limit"], offset=kwargs["offset"]
+            )
+
+        return await self._get_resources(query=query, model_class=User, **kwargs)
 
     async def get_users_count(self) -> int:
         return await self._get_count(query=get_users_count_stmt)
@@ -114,9 +118,19 @@ class Database:
         return await self._get_resource(query=get_order_stmt, model_class=Order, id=id)
 
     async def get_orders(self, **kwargs) -> List[Order]:
+        query: Query = get_orders_stmt
+
+        if "limit" in kwargs and "offset" in kwargs:
+            query: Query = create_paginate_query(
+                query=query, limit=kwargs["limit"], offset=kwargs["offset"]
+            )
+
         return await self._get_resources(
             query=get_orders_stmt, model_class=Order, **kwargs
         )
+
+    async def get_orders_count(self) -> int:
+        return await self._get_count(query=get_orders_count_stmt)
 
     # Documents
 
@@ -134,9 +148,14 @@ class Database:
         )
 
     async def get_documents(self, **kwargs) -> List[Document]:
-        return await self._get_resources(
-            query=get_documents_stmt, model_class=Document, **kwargs
-        )
+        query: Query = get_documents_stmt
+
+        if "limit" in kwargs and "offset" in kwargs:
+            query: Query = create_paginate_query(
+                query=query, limit=kwargs["limit"], offset=kwargs["offset"]
+            )
+
+        return await self._get_resources(query=query, model_class=Document, **kwargs)
 
     async def get_documents_count(self) -> int:
         return await self._get_count(query=get_documents_count_stmt)

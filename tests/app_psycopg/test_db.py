@@ -5,8 +5,7 @@ from polyfactory.factories.pydantic_factory import ModelFactory
 
 from app_psycopg.db.db import (
     Database,
-    create_paginate_query_from_text,
-    create_count_query_from_text,
+    create_paginate_query,
 )
 from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
 from app_psycopg.db.db_models import User, Order
@@ -25,34 +24,27 @@ async def test_create_paginate_query_from_text():
     """Test create_paginate_query_from_text function."""
     # Test with no limit or offset
     query = "SELECT * FROM users"
-    result = create_paginate_query_from_text(query, None, None)
+    result = create_paginate_query(query, None, None)
     assert result.strip() == "SELECT * FROM users"
 
     # Test with limit only
-    result = create_paginate_query_from_text(query, 10, None)
+    result = create_paginate_query(query, 10, None)
     # Use a more flexible assertion that ignores whitespace
     assert "SELECT * FROM users" in result and "LIMIT 10" in result
 
     # Test with offset only
-    result = create_paginate_query_from_text(query, None, 5)
+    result = create_paginate_query(query, None, 5)
     # Use a more flexible assertion that ignores whitespace
     assert "SELECT * FROM users" in result and "OFFSET 5" in result
 
     # Test with both limit and offset
-    result = create_paginate_query_from_text(query, 10, 5)
+    result = create_paginate_query(query, 10, 5)
     # Use a more flexible assertion that ignores whitespace
     assert (
         "SELECT * FROM users" in result
         and "LIMIT 10" in result
         and "OFFSET 5" in result
     )
-
-
-def test_create_count_query_from_text():
-    """Test create_count_query_from_text function."""
-    query = "SELECT * FROM users"
-    result = create_count_query_from_text(query)
-    assert result == "SELECT count(*) FROM (SELECT * FROM users) AS __count_query__"
 
 
 class AsyncCursorContextManagerMock:

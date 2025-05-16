@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Sequence
+from typing import Generic, TypeVar, Sequence, List
 
 from psycopg.abc import Query
 from pydantic import conint
@@ -16,8 +16,8 @@ class LimitOffsetPage(GenericModel, Generic[DataT]):
     offset: conint(ge=0)
 
 
-def create_paginate_query_from_text(query: Query, limit: int, offset: int) -> Query:
-    suffix_parts = [
+def create_paginate_query(query: Query, limit: int, offset: int) -> Query:
+    suffix_parts: List[sql.Composed] = [
         sql.SQL("LIMIT {}").format(sql.Literal(limit)),
         sql.SQL("OFFSET {}").format(sql.Literal(offset)),
     ]
@@ -28,5 +28,5 @@ def create_paginate_query_from_text(query: Query, limit: int, offset: int) -> Qu
         return query + bytes(str(suffix), "utf-8")
     elif isinstance(query, sql.SQL) or isinstance(query, sql.Composed):
         return sql.Composed([query, sql.SQL(" "), suffix])
-    else:  # Assuming the fallback is a string (LiteralString)
+    else:
         return f"{query} {suffix}".strip()

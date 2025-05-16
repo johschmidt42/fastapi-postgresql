@@ -46,6 +46,10 @@ get_orders_stmt: LiteralString = """
     SELECT * FROM orders
 """
 
+get_orders_count_stmt: LiteralString = """
+    SELECT COUNT(*) FROM orders
+"""
+
 insert_document_stmt: LiteralString = """
     INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)
     RETURNING id
