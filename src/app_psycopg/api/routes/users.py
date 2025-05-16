@@ -4,6 +4,7 @@ from fastapi import APIRouter, Body, Depends, status, Query
 
 from app_psycopg.api.dependencies import get_db, validate_user_id
 from app_psycopg.api.models import UserInput, UserUpdate, UserResponseModel
+from app_psycopg.api.pagination import LimitOffsetPage
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User
 
@@ -33,15 +34,23 @@ async def get_user(
 
 
 @router.get(
-    path="", response_model=List[UserResponseModel], status_code=status.HTTP_200_OK
+    path="",
+    response_model=LimitOffsetPage[UserResponseModel],
+    status_code=status.HTTP_200_OK,
 )
 async def get_users(
     db: Annotated[Database, Depends(get_db)],
     limit: int = Query(default=10, ge=1),
     offset: int = Query(default=0, ge=0),
-) -> List[UserResponseModel]:
+) -> LimitOffsetPage[UserResponseModel]:
     users: List[User] = await db.get_users(limit=limit, offset=offset)
-    return [UserResponseModel.model_validate(user) for user in users]
+    total: int = await db.get_users_count()
+    return LimitOffsetPage(
+        items=[UserResponseModel.model_validate(user) for user in users],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)

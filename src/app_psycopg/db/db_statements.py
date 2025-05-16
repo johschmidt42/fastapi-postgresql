@@ -9,6 +9,10 @@ get_users_stmt: LiteralString = """
     SELECT * FROM users
 """
 
+get_users_count_stmt: LiteralString = """
+    SELECT COUNT(*) FROM users
+"""
+
 get_user_stmt: LiteralString = """
     SELECT * FROM users WHERE id = %(id)s
 """
@@ -53,6 +57,10 @@ get_document_stmt: LiteralString = """
 
 get_documents_stmt: LiteralString = """
     SELECT * FROM documents
+"""
+
+get_documents_count_stmt: LiteralString = """
+    SELECT COUNT(*) FROM documents
 """
 
 document_user_stmt: LiteralString = """

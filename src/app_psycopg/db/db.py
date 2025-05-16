@@ -1,4 +1,4 @@
-from typing import TypeVar, List, LiteralString, Optional, cast
+from typing import TypeVar, List, cast
 
 from psycopg import AsyncConnection
 from psycopg.abc import Query
@@ -12,6 +12,7 @@ from app_psycopg.api.models import (
     DocumentInput,
     DocumentUpdate,
 )
+from app_psycopg.api.pagination import create_paginate_query_from_text
 from app_psycopg.db.db_models import Order, User, Document
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
@@ -21,31 +22,17 @@ from app_psycopg.db.db_statements import (
     insert_user_stmt,
     update_user_stmt,
     get_users_stmt,
+    get_users_count_stmt,
     get_orders_stmt,
     get_document_stmt,
     get_documents_stmt,
     insert_document_stmt,
     document_user_stmt,
     delete_document_stmt,
+    get_documents_count_stmt,
 )
 
 T: TypeVar = TypeVar("T")
-
-
-def create_paginate_query_from_text(
-    query: Query, limit: Optional[int], offset: Optional[int]
-) -> LiteralString:
-    suffix = ""
-    if limit is not None:
-        suffix += f" LIMIT {limit}"
-    if offset is not None:
-        suffix += f" OFFSET {offset}"
-
-    return cast(LiteralString, f"{query} {suffix}".strip())
-
-
-def create_count_query_from_text(query: str) -> str:
-    return f"SELECT count(*) FROM ({query}) AS __count_query__"
 
 
 class Database:
@@ -90,6 +77,12 @@ class Database:
             )
             return await cursor.fetchall()
 
+    async def _get_count(self, query: Query) -> int:
+        async with self.conn.cursor() as cursor:
+            await cursor.execute(query=query)
+            result = await cursor.fetchone()
+            return cast(int, result[0])
+
     # User
 
     async def get_users(self, **kwargs) -> List[User]:
@@ -97,13 +90,16 @@ class Database:
             query=get_users_stmt, model_class=User, **kwargs
         )
 
+    async def get_users_count(self) -> int:
+        return await self._get_count(query=get_users_count_stmt)
+
     async def get_user(self, id: str) -> User | None:
         return await self._get_resource(query=get_user_stmt, model_class=User, id=id)
 
     async def insert_user(self, data: UserInput) -> str:
         return await self._insert_resource(query=insert_user_stmt, data=data)
 
-    async def update_user(self, id: str | str, update: UserUpdate) -> str | None:
+    async def update_user(self, id: str, update: UserUpdate) -> str | None:
         return await self._update_resource(query=update_user_stmt, update=update, id=id)
 
     async def delete_user(self, id: str) -> None:
@@ -127,9 +123,7 @@ class Database:
     async def insert_document(self, data: DocumentInput) -> str:
         return await self._insert_resource(query=insert_document_stmt, data=data)
 
-    async def update_document(
-        self, id: str | str, update: DocumentUpdate
-    ) -> str | None:
+    async def update_document(self, id: str, update: DocumentUpdate) -> str | None:
         return await self._update_resource(
             query=document_user_stmt, update=update, id=id
         )
@@ -143,6 +137,9 @@ class Database:
         return await self._get_resources(
             query=get_documents_stmt, model_class=Document, **kwargs
         )
+
+    async def get_documents_count(self) -> int:
+        return await self._get_count(query=get_documents_count_stmt)
 
     async def delete_document(self, id: str) -> None:
         return await self._delete_resource(delete_document_stmt, id=id)

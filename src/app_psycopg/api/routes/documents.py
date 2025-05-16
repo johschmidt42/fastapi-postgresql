@@ -8,6 +8,7 @@ from app_psycopg.api.models import (
     DocumentResponseModel,
     DocumentUpdate,
 )
+from app_psycopg.api.pagination import LimitOffsetPage
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import Document
 
@@ -38,15 +39,25 @@ async def get_document(
 
 
 @router.get(
-    path="", response_model=List[DocumentResponseModel], status_code=status.HTTP_200_OK
+    path="",
+    response_model=LimitOffsetPage[DocumentResponseModel],
+    status_code=status.HTTP_200_OK,
 )
 async def get_documents(
     db: Annotated[Database, Depends(get_db)],
     limit: int = Query(default=10, ge=1),
     offset: int = Query(default=0, ge=0),
-) -> List[DocumentResponseModel]:
+) -> LimitOffsetPage[DocumentResponseModel]:
     documents: List[Document] = await db.get_documents(limit=limit, offset=offset)
-    return [DocumentResponseModel.model_validate(document) for document in documents]
+    total: int = await db.get_documents_count()
+    return LimitOffsetPage(
+        items=[
+            DocumentResponseModel.model_validate(document) for document in documents
+        ],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.put(path="/{document_id}", response_model=str, status_code=status.HTTP_200_OK)
