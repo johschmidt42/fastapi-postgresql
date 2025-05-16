@@ -1,8 +1,18 @@
 from sqlalchemy import DECIMAL, String, ForeignKey
 from sqlalchemy import TIMESTAMP
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app_sqlalchemy.db import Base
+
+
+class Document(Base):
+    __tablename__ = "documents"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    document: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[str] = mapped_column(TIMESTAMP, nullable=False)
+    last_updated_at: Mapped[str] = mapped_column(TIMESTAMP, nullable=True)
 
 
 class User(Base):

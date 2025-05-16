@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from starlette import status
 
 from app_sqlalchemy.api.models import OrderInput
-from app_sqlalchemy.db.db_models import User
+from app_sqlalchemy.db.db_models import User, Document
 from dataclasses import dataclass
 
 
@@ -37,6 +37,19 @@ class ValidatedOrder:
     order_input: OrderInput
     payer: User
     payee: User
+
+
+async def validate_document_id(
+    session: Annotated[AsyncSession, Depends(get_db_session)], document_id: str
+) -> Document:
+    document: Document | None = await session.get(Document, document_id)
+    if document is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document '{document_id}' not found!",
+        )
+
+    return document
 
 
 async def validate_order_input(
