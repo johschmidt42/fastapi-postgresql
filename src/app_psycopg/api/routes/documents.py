@@ -19,9 +19,9 @@ router: APIRouter = APIRouter(
     prefix="/documents",
 )
 
-user_sortable_fields: List[str] = ["created_at", "last_updated_at"]
+document_sortable_fields: List[str] = ["created_at", "last_updated_at"]
 OrderByDocument: Type = Annotated[
-    Optional[Set[create_order_by_enum(user_sortable_fields)]],
+    Optional[Set[create_order_by_enum(document_sortable_fields)]],
     AfterValidator(validate_order_by_query_params),
 ]
 

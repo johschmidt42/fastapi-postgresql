@@ -1,6 +1,7 @@
-from typing import Annotated, List, Any
+from typing import Annotated, List, Any, Type, Optional, Set
 
 from fastapi import APIRouter, Body, Depends, status, Query
+from pydantic import AfterValidator
 from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -11,12 +12,22 @@ from app_sqlalchemy.api.models import (
     DocumentInput,
     DocumentUpdate,
 )
+from app_sqlalchemy.api.sorting import (
+    create_order_by_enum,
+    validate_order_by_query_params,
+)
 from app_sqlalchemy.db.db_models import Document
 
 router: APIRouter = APIRouter(
     tags=["Documents"],
     prefix="/documents",
 )
+
+document_sortable_fields: List[str] = ["created_at", "last_updated_at"]
+OrderByDocument: Type = Annotated[
+    Optional[Set[create_order_by_enum(document_sortable_fields)]],
+    AfterValidator(validate_order_by_query_params),
+]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
@@ -51,8 +62,9 @@ async def get_document(
 )
 async def get_documents(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: int = Query(default=10, ge=1),
-    offset: int = Query(default=0, ge=0),
+    limit: Annotated[int, Query(ge=1)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> List[DocumentResponseModel]:
     query: Select = select(Document).limit(limit).offset(offset)
 
