@@ -51,6 +51,45 @@ def test_get_users(client: TestClient):
     assert "name" in response.json()[0]
 
 
+def test_get_users_with_pagination(client: TestClient):
+    """Test getting a list of users with pagination."""
+    # Make request with limit and offset
+    response = client.get("/users?limit=5&offset=2")
+
+    # Assert response
+    assert response.status_code == status.HTTP_200_OK
+    assert isinstance(response.json(), list)
+
+    # We can't assert the exact number of items because it depends on the database state
+    # But we can check that the response is a list and has the expected structure
+    if len(response.json()) > 0:
+        assert "id" in response.json()[0]
+        assert "name" in response.json()[0]
+
+
+def test_get_users_with_sorting(client: TestClient):
+    """Test getting a list of users with sorting."""
+    # Test ascending sort by name
+    response = client.get("/users?order_by=%2Bname")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test descending sort by name
+    response = client.get("/users?order_by=%2Dname")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test sort by created_at
+    response = client.get("/users?order_by=%2Bcreated_at")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test sort by last_updated_at
+    response = client.get("/users?order_by=%2Dlast_updated_at")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test multiple sort fields
+    response = client.get("/users?order_by=%2Bname&order_by=%2Dcreated_at")
+    assert response.status_code == status.HTTP_200_OK
+
+
 def test_update_user(client: TestClient, user_id):
     """Test updating a user."""
     # Make request

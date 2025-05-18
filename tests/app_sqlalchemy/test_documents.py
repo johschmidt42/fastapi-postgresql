@@ -51,6 +51,39 @@ def test_get_documents(client: TestClient):
     assert "document" in response.json()[0]
 
 
+def test_get_documents_with_pagination(client: TestClient):
+    """Test getting a list of documents with pagination."""
+    # Make request with limit and offset
+    response = client.get("/documents?limit=5&offset=2")
+
+    # Assert response
+    assert response.status_code == status.HTTP_200_OK
+    assert isinstance(response.json(), list)
+
+    # We can't assert the exact number of items because it depends on the database state
+    # But we can check that the response is a list and has the expected structure
+    if len(response.json()) > 0:
+        assert "id" in response.json()[0]
+        assert "document" in response.json()[0]
+
+
+def test_get_documents_with_sorting(client: TestClient):
+    """Test getting a list of documents with sorting."""
+    # Test ascending sort
+    response = client.get("/documents?order_by=%2Bcreated_at")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test descending sort
+    response = client.get("/documents?order_by=%2Dlast_updated_at")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Test multiple sort fields
+    response = client.get(
+        "/documents?order_by=%2Bcreated_at&order_by=%2Dlast_updated_at"
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+
 def test_update_document(client: TestClient, document_id):
     """Test updating a document."""
     # Make request
