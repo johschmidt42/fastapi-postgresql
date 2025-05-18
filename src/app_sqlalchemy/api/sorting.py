@@ -2,7 +2,7 @@ from enum import StrEnum, Enum
 from typing import List, Set, Any
 
 from pydantic import BaseModel
-from sqlalchemy import Select, asc, desc
+from sqlalchemy import Select, asc, desc, nulls_last
 
 
 def create_order_by_enum(values: List[str]) -> StrEnum:
@@ -102,8 +102,8 @@ def create_order_by_query(
     for field in order_by_fields:
         column = getattr(model, field.name)
         if field.direction == Direction.ASC:
-            order_clauses.append(asc(column))
+            order_clauses.append(nulls_last(asc(column)))
         else:
-            order_clauses.append(desc(column))
+            order_clauses.append(nulls_last(desc(column)))
 
     return query.order_by(*order_clauses)

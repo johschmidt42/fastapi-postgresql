@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, computed_field, ConfigDict
@@ -27,6 +28,8 @@ class UserUpdate(BaseModel):
 class UserResponseModel(BaseModel):
     id: str
     name: str
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -73,5 +76,7 @@ class DocumentUpdate(BaseModel):
 class DocumentResponseModel(BaseModel):
     id: str
     document: dict
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
