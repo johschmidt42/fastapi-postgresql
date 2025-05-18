@@ -1,23 +1,30 @@
+CREATE TABLE IF NOT EXISTS profession (
+    id UUID PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+
 CREATE TABLE IF NOT EXISTS users
 (
-    id CHAR(32) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    id UUID PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    last_updated_at TIMESTAMP
+    last_updated_at TIMESTAMP,
+    profession_id UUID REFERENCES profession(id) NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS orders
 (
-    id CHAR(32) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     amount DECIMAL NOT NULL,
-    payer_id CHAR(32) REFERENCES users (id) NOT NULL,
-    payee_id CHAR(32) REFERENCES users (id) NOT NULL
+    payer_id UUID REFERENCES users (id) NOT NULL,
+    payee_id UUID REFERENCES users (id) NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS documents (
-    id CHAR(32) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     document JSONB,
     created_at TIMESTAMP NOT NULL,
     last_updated_at TIMESTAMP
