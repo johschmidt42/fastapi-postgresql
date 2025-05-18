@@ -11,6 +11,7 @@ from app_sqlalchemy.api.models import UserResponseModel, UserInput, UserUpdate
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
+    create_order_by_query,
 )
 from app_sqlalchemy.db.db_models import User
 
@@ -61,6 +62,11 @@ async def get_users(
     order_by: Annotated[OrderByUser, Query()] = None,
 ) -> List[UserResponseModel]:
     query: Select = select(User).limit(limit).offset(offset)
+
+    if order_by:
+        query: Select = create_order_by_query(
+            query=query, order_by_fields=order_by, model=User
+        )
 
     result: Result = await db_session.execute(query)
 

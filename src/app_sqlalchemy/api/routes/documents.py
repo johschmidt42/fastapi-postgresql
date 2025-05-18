@@ -15,6 +15,7 @@ from app_sqlalchemy.api.models import (
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
+    create_order_by_query,
 )
 from app_sqlalchemy.db.db_models import Document
 
@@ -67,6 +68,11 @@ async def get_documents(
     order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> List[DocumentResponseModel]:
     query: Select = select(Document).limit(limit).offset(offset)
+
+    if order_by:
+        query: Select = create_order_by_query(
+            query=query, order_by_fields=order_by, model=Document
+        )
 
     result: Result = await db_session.execute(query)
 
