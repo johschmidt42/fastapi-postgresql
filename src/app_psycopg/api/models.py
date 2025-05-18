@@ -10,6 +10,7 @@ from pydantic import (
     field_serializer,
     StringConstraints,
     Field,
+    UUID4,
 )
 
 
@@ -27,8 +28,8 @@ class UserInput(BaseModel):
     name: UserName
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -65,8 +66,8 @@ class OrderInput(BaseModel):
     payee_id: str
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
 
 class OrderResponseModel(BaseModel):
@@ -87,8 +88,8 @@ class DocumentInput(BaseModel):
     document: NonEmptyDict
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
