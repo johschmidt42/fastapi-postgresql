@@ -92,7 +92,12 @@ def test_get_users(client: TestClient, mock_db, user):
 def test_update_user(client: TestClient, mock_db, user):
     """Test updating a user."""
     # Setup mock
-    updated_user = User(id=user.id, name="Updated User", created_at=user.created_at, last_updated_at=user.last_updated_at)
+    updated_user = User(
+        id=user.id,
+        name="Updated User",
+        created_at=user.created_at,
+        last_updated_at=user.last_updated_at,
+    )
     mock_db.update_user.return_value = user.id
     mock_db.get_user.return_value = updated_user
 
