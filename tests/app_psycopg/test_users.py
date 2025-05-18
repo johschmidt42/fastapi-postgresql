@@ -58,10 +58,11 @@ def test_get_user(client: TestClient, mock_db, user):
 
     # Assert response
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "id": user.id,
-        "name": user.name,
-    }
+    response_json = response.json()
+    assert response_json["id"] == user.id
+    assert response_json["name"] == user.name
+    assert "created_at" in response_json
+    assert "last_updated_at" in response_json
 
 
 def test_get_users(client: TestClient, mock_db, user):
@@ -74,21 +75,24 @@ def test_get_users(client: TestClient, mock_db, user):
 
     # Assert response
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {
-            "id": user.id,
-            "name": user.name,
-        }
-    ]
+    response_json = response.json()
+    assert "items" in response_json
+    assert len(response_json["items"]) == 1
+    assert response_json["items"][0]["id"] == user.id
+    assert response_json["items"][0]["name"] == user.name
+    assert "limit" in response_json
+    assert "offset" in response_json
+    assert "items_count" in response_json
+    assert "total_count" in response_json
 
     # Assert mock calls
-    mock_db.get_users.assert_called_once_with(limit=10, offset=0)
+    mock_db.get_users.assert_called_once_with(limit=10, offset=0, order_by=None)
 
 
 def test_update_user(client: TestClient, mock_db, user):
     """Test updating a user."""
     # Setup mock
-    updated_user = User(id=user.id, name="Updated User")
+    updated_user = User(id=user.id, name="Updated User", created_at=user.created_at, last_updated_at=user.last_updated_at)
     mock_db.update_user.return_value = user.id
     mock_db.get_user.return_value = updated_user
 

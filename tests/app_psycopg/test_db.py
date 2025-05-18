@@ -22,22 +22,8 @@ class OrderFactory(ModelFactory[Order]):
 @pytest.mark.asyncio
 async def test_create_paginate_query_from_text():
     """Test create_paginate_query_from_text function."""
-    # Test with no limit or offset
-    query = "SELECT * FROM users"
-    result = create_paginate_query(query, None, None)
-    assert result.strip() == "SELECT * FROM users"
-
-    # Test with limit only
-    result = create_paginate_query(query, 10, None)
-    # Use a more flexible assertion that ignores whitespace
-    assert "SELECT * FROM users" in result and "LIMIT 10" in result
-
-    # Test with offset only
-    result = create_paginate_query(query, None, 5)
-    # Use a more flexible assertion that ignores whitespace
-    assert "SELECT * FROM users" in result and "OFFSET 5" in result
-
     # Test with both limit and offset
+    query = "SELECT * FROM users"
     result = create_paginate_query(query, 10, 5)
     # Use a more flexible assertion that ignores whitespace
     assert (

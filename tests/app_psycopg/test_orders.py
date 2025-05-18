@@ -107,18 +107,13 @@ def test_create_order(client: TestClient, mock_db, order, validated_order):
 
     # Assert response
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "id": order.id,
-        "amount": order.amount,
-        "payer": {
-            "id": order.payer.id,
-            "name": order.payer.name,
-        },
-        "payee": {
-            "id": order.payee.id,
-            "name": order.payee.name,
-        },
-    }
+    response_json = response.json()
+    assert response_json["id"] == order.id
+    assert response_json["amount"] == order.amount
+    assert response_json["payer"]["id"] == order.payer.id
+    assert response_json["payer"]["name"] == order.payer.name
+    assert response_json["payee"]["id"] == order.payee.id
+    assert response_json["payee"]["name"] == order.payee.name
 
     # Assert mock calls
     mock_db.insert_order.assert_called_once_with(validated_order.order_input)
