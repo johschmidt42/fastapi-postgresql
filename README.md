@@ -9,9 +9,14 @@ This repository demonstrates how to integrate 2 popular **async PostgreSQL libra
 
 **Features**:
 
-- Automatic commits & rollbacks using FastAPI's dependency injection system.
-- Basic limit offset pagination.
-- Unit tests.
+- **Database Transaction Handling**: Automatic commits & rollbacks using FastAPI's dependency injection system & context
+  managers.
+- **Pagination**: Basic limit offset pagination.
+- **Sorting**: Multi-column sorting via query parameters: `?order_by=+[attr]` for ascending order and
+  `?order_by=-[attr]`
+  for descending order (compatible with OpenAPI).
+- **Filtering**: TODO
+- **Testing**: Unit tests.
 
 ## Getting started
 
@@ -21,7 +26,7 @@ This repository demonstrates how to integrate 2 popular **async PostgreSQL libra
 make start-db
 ```
 
-- Create the tables by executing the SQL statements in [db/schema.sql](db/schema.sql).
+- Create the (empty) tables by executing the SQL statements in [db/schema.sql](db/schema.sql).
 
 ![schema.png](docs/schema.png)
 
@@ -47,7 +52,8 @@ Go to [app_sqlalchemy](src/app_sqlalchemy)
 ## Other Resources
 
 - Comparison between psycopg & asyncpg: https://fernandoarteaga.dev/blog/psycopg-vs-asyncpg/
+- Best Practices API design: https://www.speakeasy.com/api-design
 
 ## TODO
 
-- [ ] Add filters, sorting
+- [ ] Add filters
