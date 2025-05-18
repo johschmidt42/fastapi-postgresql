@@ -18,7 +18,7 @@ router: APIRouter = APIRouter(
 )
 async def create_order(
     db: Annotated[Database, Depends(get_db)],
-    validated_order_input: ValidatedOrder = Depends(validate_order_input),
+    validated_order_input: Annotated[ValidatedOrder, Depends(validate_order_input)],
 ) -> OrderResponseModel:
     order_id: str = await db.insert_order(validated_order_input.order_input)
     order: Order = await db.get_order(order_id)

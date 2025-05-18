@@ -1,15 +1,16 @@
-from typing import Annotated, List, Optional
+from typing import Annotated, List, Type, Optional, Set
 
 from fastapi import APIRouter, Body, Depends, status, Query
+from pydantic import AfterValidator
 
 from app_psycopg.api.dependencies import get_db, validate_user_id
 from app_psycopg.api.models import (
     UserInput,
     UserUpdate,
     UserResponseModel,
-    OrderByUserOptions,
 )
 from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import User
 
@@ -17,6 +18,12 @@ router: APIRouter = APIRouter(
     tags=["Users"],
     prefix="/users",
 )
+
+user_sortable_fields: List[str] = ["name", "created_at", "last_updated_at"]
+OrderByUser: Type = Annotated[
+    Optional[Set[create_order_by_enum(user_sortable_fields)]],
+    AfterValidator(validate_order_by_query_params),
+]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
@@ -45,9 +52,9 @@ async def get_user(
 )
 async def get_users(
     db: Annotated[Database, Depends(get_db)],
-    limit: int = Query(default=10, ge=1),
-    offset: int = Query(default=0, ge=0),
-    order_by: Optional[OrderByUserOptions] = Query(None),
+    limit: Annotated[int, Query(ge=1)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    order_by: Annotated[OrderByUser, Query()] = None,
 ) -> LimitOffsetPage[UserResponseModel]:
     users: List[User] = await db.get_users(
         limit=limit, offset=offset, order_by=order_by

@@ -13,7 +13,7 @@ from app_psycopg.api.models import (
     DocumentUpdate,
 )
 from app_psycopg.api.pagination import create_paginate_query
-from app_psycopg.api.sorting import create_order_by_query, OrderByField, parse_order_by
+from app_psycopg.api.sorting import create_order_by_query
 from app_psycopg.db.db_models import Order, User, Document
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
@@ -70,15 +70,12 @@ class Database:
     async def _get_resources(
         self, query: Query, model_class: type[T], **kwargs
     ) -> List[T]:
-        if "order_by" in kwargs:
-            order_by_fields: List[OrderByField] = parse_order_by(
-                order_by=kwargs["order_by"]
-            )
+        if kwargs.get("order_by"):
             query: Query = create_order_by_query(
-                query=query, order_by_fields=order_by_fields
+                query=query, order_by_fields=kwargs.get("order_by")
             )
 
-        if "limit" in kwargs and "offset" in kwargs:
+        if kwargs.get("limit") and kwargs.get("offset"):
             query: Query = create_paginate_query(
                 query=query, limit=kwargs["limit"], offset=kwargs["offset"]
             )

@@ -1,6 +1,7 @@
-from typing import Annotated, List
+from typing import Annotated, List, Type, Optional, Set
 
 from fastapi import APIRouter, Body, Depends, status, Query
+from pydantic import AfterValidator
 
 from app_psycopg.api.dependencies import get_db, validate_document_id
 from app_psycopg.api.models import (
@@ -9,6 +10,7 @@ from app_psycopg.api.models import (
     DocumentUpdate,
 )
 from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 from app_psycopg.db.db_models import Document
 
@@ -16,6 +18,12 @@ router: APIRouter = APIRouter(
     tags=["Documents"],
     prefix="/documents",
 )
+
+user_sortable_fields: List[str] = ["created_at", "last_updated_at"]
+OrderByDocument: Type = Annotated[
+    Optional[Set[create_order_by_enum(user_sortable_fields)]],
+    AfterValidator(validate_order_by_query_params),
+]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
@@ -45,10 +53,13 @@ async def get_document(
 )
 async def get_documents(
     db: Annotated[Database, Depends(get_db)],
-    limit: int = Query(default=10, ge=1),
-    offset: int = Query(default=0, ge=0),
+    limit: Annotated[int, Query(ge=1)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> LimitOffsetPage[DocumentResponseModel]:
-    documents: List[Document] = await db.get_documents(limit=limit, offset=offset)
+    documents: List[Document] = await db.get_documents(
+        limit=limit, offset=offset, order_by=order_by
+    )
     total: int = await db.get_documents_count()
 
     items: List[DocumentResponseModel] = [
