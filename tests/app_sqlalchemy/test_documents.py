@@ -31,10 +31,11 @@ def test_get_document(client: TestClient, document_id, document_response):
 
     # Assert response
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "id": document_id,
-        "document": document_response.document,
-    }
+    response_json = response.json()
+    assert response_json["id"] == document_id
+    assert response_json["document"] == document_response.document
+    assert "created_at" in response_json
+    assert "last_updated_at" in response_json
 
 
 def test_get_documents(client: TestClient):

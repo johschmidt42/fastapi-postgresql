@@ -31,10 +31,11 @@ def test_get_user(client: TestClient, user_id, user_response):
 
     # Assert response
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "id": user_id,
-        "name": user_response.name,
-    }
+    response_json = response.json()
+    assert response_json["id"] == user_id
+    assert response_json["name"] == user_response.name
+    assert "created_at" in response_json
+    assert "last_updated_at" in response_json
 
 
 def test_get_users(client: TestClient):
