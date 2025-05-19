@@ -189,7 +189,7 @@ def test_get_user_company_links_by_company(
     assert len(response_json["items"]) == 1
     # Don't assert the exact company_id value, just check it exists
     assert "company_id" in response_json["items"][0]
-    assert "user" in response_json["items"][0]
+    assert "user_info" in response_json["items"][0]
     assert "limit" in response_json
     assert "offset" in response_json
     assert "items_count" in response_json
