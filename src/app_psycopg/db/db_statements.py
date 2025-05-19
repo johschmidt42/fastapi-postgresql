@@ -1,6 +1,6 @@
 from typing import LiteralString
 
-# User
+# region User
 
 insert_user_stmt: LiteralString = """
     INSERT INTO users (id, name, created_at, profession_id) VALUES (%(id)s, %(name)s, %(created_at)s, %(profession_id)s)
@@ -35,7 +35,11 @@ update_user_stmt: LiteralString = """
 """
 
 patch_user_stmt: LiteralString = """
-    UPDATE users SET (name, last_updated_at, profession_id) = (%(name)s, %(last_updated_at)s, %(profession_id)s)
+    UPDATE users
+    SET 
+        name = COALESCE(%(name)s, name),
+        last_updated_at = %(last_updated_at)s,
+        profession_id = COALESCE(%(profession_id)s, profession_id)
     WHERE id = %(id)s
     RETURNING id
 """
@@ -49,7 +53,9 @@ insert_order_stmt: LiteralString = """
     RETURNING id
 """
 
-# Order
+# endregion
+
+# region Order
 
 get_order_stmt: LiteralString = """
     SELECT 
@@ -69,7 +75,9 @@ get_orders_count_stmt: LiteralString = """
     SELECT COUNT(*) FROM orders
 """
 
-# Document
+# endregion
+
+# region Document
 
 insert_document_stmt: LiteralString = """
     INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)
@@ -98,7 +106,9 @@ delete_document_stmt: LiteralString = """
     DELETE FROM documents WHERE id = %(id)s
 """
 
-# Profession
+# endregion
+
+# region Profession
 
 insert_profession_stmt: LiteralString = """
     INSERT INTO profession (id, name) VALUES (%(id)s, %(name)s)
@@ -126,3 +136,5 @@ update_profession_stmt: LiteralString = """
 delete_profession_stmt: LiteralString = """
     DELETE FROM profession WHERE id = %(id)s
 """
+
+# endregion

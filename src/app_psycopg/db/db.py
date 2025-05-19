@@ -44,7 +44,8 @@ from app_psycopg.db.db_statements import (
     get_professions_stmt,
     get_professions_count_stmt,
     update_profession_stmt,
-    delete_profession_stmt, patch_user_stmt,
+    delete_profession_stmt,
+    patch_user_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -80,7 +81,7 @@ class Database:
         self, query: Query, patch: BaseModel, **kwargs
     ) -> str | None:
         async with self.conn.cursor() as cursor:
-            kwargs.update(patch.model_dump(exclude_unset=True))
+            kwargs.update(patch.model_dump())
             await cursor.execute(query=query, params=kwargs)
             data_out: tuple = await cursor.fetchone()
             return data_out[0]
