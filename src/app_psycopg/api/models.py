@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional, Annotated, Type
 from uuid import uuid4
 
@@ -43,7 +44,7 @@ class BasePatch(BaseModel):
         return self
 
 
-# Profession
+# region Profession
 
 ProfessionName: Type = Annotated[
     str,
@@ -78,7 +79,9 @@ class Profession(BaseModel):
     last_updated_at: Optional[datetime] = None
 
 
-# User
+# endregion
+
+# region User
 
 UserName: Type = Annotated[
     str,
@@ -127,11 +130,11 @@ class User(BaseModel):
     profession: Profession
 
 
-# Order
+# endregion
 
-OrderAmount: Type = Annotated[
-    float, Field(strict=True, gt=0, le=1_000_000, decimal_places=2)
-]
+# region Order
+
+OrderAmount: Type = Annotated[Decimal, Field(gt=0, le=1_000_000, decimal_places=2)]
 
 
 class OrderInput(BaseModel):
@@ -143,6 +146,18 @@ class OrderInput(BaseModel):
     def id(self) -> UUID4:
         return uuid4()
 
+    @model_validator(mode="after")
+    def check_payer_payee_different(self):
+        if self.payer_id == self.payee_id:
+            raise ValueError("payer_id and payee_id must be different")
+        return self
+
+
+class OrderInputValidated(BaseModel):
+    order_input: OrderInput
+    payer: User
+    payee: User
+
 
 class Order(BaseModel):
     id: UUID4
@@ -151,7 +166,9 @@ class Order(BaseModel):
     payee: User
 
 
-# Document
+# endregion
+
+# region Document
 
 NonEmptyDict: Type = Annotated[dict, Field(min_length=1)]
 
@@ -189,3 +206,6 @@ class Document(BaseModel):
     document: NonEmptyDict
     created_at: datetime
     last_updated_at: Optional[datetime] = None
+
+
+# endregion

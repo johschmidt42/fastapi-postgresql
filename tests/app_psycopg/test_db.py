@@ -1,4 +1,6 @@
 import pytest
+import uuid
+from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from polyfactory.factories.pydantic_factory import ModelFactory
@@ -7,8 +9,7 @@ from app_psycopg.db.db import (
     Database,
     create_paginate_query,
 )
-from app_psycopg.api.models import UserInput, UserUpdate, OrderInput
-from app_psycopg.db.db_models import User, Order
+from app_psycopg.api.models import UserInput, UserUpdate, OrderInput, User, Order
 
 
 class UserFactory(ModelFactory[User]):
@@ -17,6 +18,10 @@ class UserFactory(ModelFactory[User]):
 
 class OrderFactory(ModelFactory[Order]):
     __model__ = Order
+
+    @classmethod
+    def amount(cls) -> Decimal:
+        return Decimal("100.00")
 
 
 @pytest.mark.asyncio
@@ -87,7 +92,7 @@ async def test_insert_resource():
 
     db = Database(conn_mock)
     query = "INSERT INTO users (name) VALUES (:name) RETURNING id"
-    data = UserInput(name="Test User")
+    data = UserInput(name="Test User", profession_id=uuid.uuid4())
 
     # Act
     result = await db._insert_resource(query, data)
@@ -114,7 +119,7 @@ async def test_update_resource():
 
     db = Database(conn_mock)
     query = "UPDATE users SET name = :name WHERE id = :id RETURNING id"
-    update = UserUpdate(name="Updated User")
+    update = UserUpdate(name="Updated User", profession_id=uuid.uuid4())
 
     # Act
     result = await db._update_resource(query, update, id="test-id")
@@ -217,7 +222,9 @@ async def test_insert_user():
 
     # Act
     with patch("app_psycopg.db.db.Database._insert_resource", db._insert_resource):
-        result = await Database(AsyncMock()).insert_user(UserInput(name="Test User"))
+        result = await Database(AsyncMock()).insert_user(
+            UserInput(name="Test User", profession_id=uuid.uuid4())
+        )
 
     # Assert
     assert result == "test-id"
@@ -234,7 +241,7 @@ async def test_update_user():
     # Act
     with patch("app_psycopg.db.db.Database._update_resource", db._update_resource):
         result = await Database(AsyncMock()).update_user(
-            "test-id", UserUpdate(name="Updated User")
+            "test-id", UserUpdate(name="Updated User", profession_id=uuid.uuid4())
         )
 
     # Assert
@@ -268,7 +275,9 @@ async def test_insert_order():
     # Act
     with patch("app_psycopg.db.db.Database._insert_resource", db._insert_resource):
         result = await Database(AsyncMock()).insert_order(
-            OrderInput(amount=100.0, payer_id="payer-id", payee_id="payee-id")
+            OrderInput(
+                amount=Decimal("100.00"), payer_id=uuid.uuid4(), payee_id=uuid.uuid4()
+            )
         )
 
     # Assert

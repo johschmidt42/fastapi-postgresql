@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from unittest.mock import patch
 
 import pytest
@@ -20,6 +21,10 @@ class UserResponseFactory(ModelFactory[User]):
 
 class OrderResponseFactory(ModelFactory[Order]):
     __model__ = Order
+
+    @classmethod
+    def amount(cls) -> Decimal:
+        return Decimal("100.00")
 
 
 @pytest.fixture
@@ -44,7 +49,7 @@ def payee():
 def order_input(payer, payee):
     """Create a test order input."""
     return OrderInput(
-        amount=100.0,
+        amount=Decimal("100.00"),
         payer_id=payer.id,
         payee_id=payee.id,
     )
@@ -65,9 +70,9 @@ def payee_response(payee):
 @pytest.fixture
 def order(order_id, payer_response, payee_response):
     """Create a test order."""
-    return OrderResponseFactory.build(
+    return Order(
         id=order_id,
-        amount=100.0,
+        amount=Decimal("100.00"),
         payer=payer_response,
         payee=payee_response,
     )
@@ -98,20 +103,24 @@ def test_create_order(client: TestClient, mock_db, order, validated_order):
         response = client.post(
             "/orders",
             json={
-                "amount": validated_order.order_input.amount,
-                "payer_id": validated_order.order_input.payer_id,
-                "payee_id": validated_order.order_input.payee_id,
+                "amount": str(validated_order.order_input.amount),
+                "payer_id": str(validated_order.order_input.payer_id),
+                "payee_id": str(validated_order.order_input.payee_id),
             },
         )
+
+    # Print response content for debugging
+    print(f"Response status: {response.status_code}")
+    print(f"Response content: {response.content}")
 
     # Assert response
     assert response.status_code == status.HTTP_201_CREATED
     response_json = response.json()
-    assert response_json["id"] == order.id
-    assert response_json["amount"] == order.amount
-    assert response_json["payer"]["id"] == order.payer.id
+    assert response_json["id"] == str(order.id)
+    assert response_json["amount"] == str(order.amount)
+    assert response_json["payer"]["id"] == str(order.payer.id)
     assert response_json["payer"]["name"] == order.payer.name
-    assert response_json["payee"]["id"] == order.payee.id
+    assert response_json["payee"]["id"] == str(order.payee.id)
     assert response_json["payee"]["name"] == order.payee.name
 
     # Assert mock calls

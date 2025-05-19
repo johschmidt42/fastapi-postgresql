@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, Request, HTTPException, Body
@@ -15,9 +14,10 @@ from app_psycopg.api.models import (
     UserPatch,
     ProfessionInput,
     ProfessionUpdate,
+    OrderInputValidated,
 )
 from app_psycopg.db.db import Database
-from app_sqlalchemy.db.db_models import Document
+from app_psycopg.api.models import Document
 
 
 async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
@@ -120,23 +120,16 @@ async def validate_document_id(
 # region Order
 
 
-@dataclass(frozen=True)
-class ValidatedOrder:
-    order_input: OrderInput
-    payer: User
-    payee: User
-
-
 async def validate_order_input(
     db: Annotated[Database, Depends(get_db)],
     order_input: Annotated[OrderInput, Body(...)],
-) -> ValidatedOrder:
+) -> OrderInputValidated:
     # Validate payer_id
     payer: User = await validate_user_id(db=db, user_id=order_input.payer_id)
     # Validate payee_id
     payee: User = await validate_user_id(db=db, user_id=order_input.payee_id)
 
-    return ValidatedOrder(order_input=order_input, payer=payer, payee=payee)
+    return OrderInputValidated(order_input=order_input, payer=payer, payee=payee)
 
 
 # endregion

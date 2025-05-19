@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from polyfactory.factories.pydantic_factory import ModelFactory
 from starlette import status
 
-from app_psycopg.db.db_models import User
+from app_psycopg.api.models import User
 
 
 class UserFactory(ModelFactory[User]):
@@ -29,21 +29,19 @@ def test_create_user(client: TestClient, mock_db, user):
     """Test creating a user."""
     # Setup mock
     mock_db.insert_user.return_value = user.id
-    mock_db.get_user.return_value = user
 
     # Make request
     response = client.post(
         "/users",
-        json={"name": user.name},
+        json={"name": user.name, "profession_id": str(user.profession.id)},
     )
 
     # Assert response
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == user.id
+    assert response.json() == str(user.id)
 
     # Assert mock calls
     mock_db.insert_user.assert_called_once()
-    mock_db.get_user.assert_called_once_with(user.id)
 
 
 def test_get_user(client: TestClient, mock_db, user):
@@ -59,7 +57,7 @@ def test_get_user(client: TestClient, mock_db, user):
     # Assert response
     assert response.status_code == status.HTTP_200_OK
     response_json = response.json()
-    assert response_json["id"] == user.id
+    assert response_json["id"] == str(user.id)
     assert response_json["name"] == user.name
     assert "created_at" in response_json
     assert "last_updated_at" in response_json
@@ -78,7 +76,7 @@ def test_get_users(client: TestClient, mock_db, user):
     response_json = response.json()
     assert "items" in response_json
     assert len(response_json["items"]) == 1
-    assert response_json["items"][0]["id"] == user.id
+    assert response_json["items"][0]["id"] == str(user.id)
     assert response_json["items"][0]["name"] == user.name
     assert "limit" in response_json
     assert "offset" in response_json
@@ -97,6 +95,7 @@ def test_update_user(client: TestClient, mock_db, user):
         name="Updated User",
         created_at=user.created_at,
         last_updated_at=user.last_updated_at,
+        profession=user.profession,
     )
     mock_db.update_user.return_value = user.id
     mock_db.get_user.return_value = updated_user
@@ -106,12 +105,12 @@ def test_update_user(client: TestClient, mock_db, user):
         # Make request
         response = client.put(
             f"/users/{user.id}",
-            json={"name": "Updated User"},
+            json={"name": "Updated User", "profession_id": str(user.profession.id)},
         )
 
     # Assert response
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == user.id
+    assert response.json() == str(user.id)
 
     # Assert mock calls
     mock_db.update_user.assert_called_once()

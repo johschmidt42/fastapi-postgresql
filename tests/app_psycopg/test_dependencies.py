@@ -1,4 +1,6 @@
 import pytest
+import uuid
+from decimal import Decimal
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import HTTPException, Request
 from psycopg import Connection, AsyncConnection
@@ -11,18 +13,29 @@ from app_psycopg.api.dependencies import (
     validate_order_input,
     ValidatedOrder,
 )
-from app_psycopg.db.db_models import Document, User
 from app_psycopg.db.db import Database
-from app_psycopg.api.models import OrderInput
+from app_psycopg.api.models import OrderInput, Document, User, Profession
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 
 class DocumentFactory(ModelFactory[Document]):
     __model__ = Document
 
+    @classmethod
+    def document(cls) -> dict:
+        return {"key": "value"}
+
+
+class ProfessionFactory(ModelFactory[Profession]):
+    __model__ = Profession
+
 
 class UserFactory(ModelFactory[User]):
     __model__ = User
+
+    @classmethod
+    def profession(cls) -> Profession:
+        return ProfessionFactory.build()
 
 
 class AsyncContextManagerMock:
@@ -58,13 +71,14 @@ async def test_get_conn():
     mock_conn_pool.connection.assert_called_once()
 
 
-def test_get_db():
+@pytest.mark.asyncio
+async def test_get_db():
     """Test get_db."""
     # Arrange
     mock_conn = MagicMock(spec=AsyncConnection)
 
     # Act
-    db = get_db(mock_conn)
+    db = await get_db(mock_conn)
 
     # Assert
     assert isinstance(db, Database)
@@ -75,7 +89,7 @@ def test_get_db():
 async def test_validate_document_id_success():
     """Test validate_document_id when document exists."""
     # Arrange
-    document_id = "test-document-id"
+    document_id = uuid.uuid4()
     document = DocumentFactory.build(id=document_id)
 
     mock_db = AsyncMock()
@@ -111,7 +125,7 @@ async def test_validate_document_id_not_found():
 async def test_validate_user_id_success():
     """Test validate_user_id when user exists."""
     # Arrange
-    user_id = "test-user-id"
+    user_id = uuid.uuid4()
     user = UserFactory.build(id=user_id)
 
     mock_db = AsyncMock()
@@ -147,11 +161,13 @@ async def test_validate_user_id_not_found():
 async def test_validate_order_input_success():
     """Test validate_order_input when both payer and payee exist."""
     # Arrange
-    payer_id = "payer-id"
-    payee_id = "payee-id"
+    payer_id = uuid.uuid4()
+    payee_id = uuid.uuid4()
     payer = UserFactory.build(id=payer_id)
     payee = UserFactory.build(id=payee_id)
-    order_input = OrderInput(amount=100.0, payer_id=payer_id, payee_id=payee_id)
+    order_input = OrderInput(
+        amount=Decimal("100.00"), payer_id=payer_id, payee_id=payee_id
+    )
 
     mock_db = AsyncMock()
 

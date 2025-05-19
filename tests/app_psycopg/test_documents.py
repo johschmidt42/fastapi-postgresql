@@ -75,7 +75,7 @@ def test_get_document(client: TestClient, mock_db, document, document_response):
     # Assert response
     assert response.status_code == status.HTTP_200_OK
     response_json = response.json()
-    assert response_json["id"] == document.id
+    assert response_json["id"] == str(document.id)
     assert response_json["document"] == document.document
     assert "created_at" in response_json
     assert "last_updated_at" in response_json
@@ -98,7 +98,7 @@ def test_get_documents(client: TestClient, mock_db, document):
     response_json = response.json()
     assert "items" in response_json
     assert len(response_json["items"]) == 1
-    assert response_json["items"][0]["id"] == document.id
+    assert response_json["items"][0]["id"] == str(document.id)
     assert response_json["items"][0]["document"] == document.document
     assert "limit" in response_json
     assert "offset" in response_json
