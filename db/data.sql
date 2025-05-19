@@ -128,7 +128,7 @@ VALUES (
 );
 
 -- Insert orders
-INSERT INTO orders (id, amount, payer_id, payee_id)
+INSERT INTO orders (id, amount, payer_id, payee_id, created_at)
 VALUES (
     gen_random_uuid(), 250.00, (
         SELECT id FROM users
@@ -137,7 +137,8 @@ VALUES (
     (
         SELECT id FROM users
         ORDER BY random() LIMIT 1
-    )
+    ),
+    now()
 ),
 (
     gen_random_uuid(), 500.50, (
@@ -147,7 +148,8 @@ VALUES (
     (
         SELECT id FROM users
         ORDER BY random() LIMIT 1
-    )
+    ),
+    now()
 ),
 (
     gen_random_uuid(), 75.90, (
@@ -157,7 +159,8 @@ VALUES (
     (
         SELECT id FROM users
         ORDER BY random() LIMIT 1
-    )
+    ),
+    now()
 ),
 (
     gen_random_uuid(), 999.99, (
@@ -167,7 +170,8 @@ VALUES (
     (
         SELECT id FROM users
         ORDER BY random() LIMIT 1
-    )
+    ),
+    now()
 ),
 (
     gen_random_uuid(), 120.75, (
@@ -177,7 +181,8 @@ VALUES (
     (
         SELECT id FROM users
         ORDER BY random() LIMIT 1
-    )
+    ),
+    now()
 );
 
 -- Insert documents

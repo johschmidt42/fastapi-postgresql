@@ -156,6 +156,10 @@ class OrderInput(BaseModel):
     def id(self) -> UUID4:
         return uuid4()
 
+    @computed_field
+    def created_at(self) -> datetime:
+        return datetime.now()
+
     @model_validator(mode="after")
     def check_payer_payee_different(self):
         if self.payer_id == self.payee_id:
@@ -174,6 +178,7 @@ class Order(BaseModel):
     amount: OrderAmount
     payer: UserShort
     payee: UserShort
+    created_at: datetime
 
 
 # endregion

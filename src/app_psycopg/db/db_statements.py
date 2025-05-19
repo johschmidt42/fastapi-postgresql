@@ -54,18 +54,18 @@ delete_user_stmt: LiteralString = """
     DELETE FROM users WHERE id = %(id)s
 """
 
-insert_order_stmt: LiteralString = """
-    INSERT INTO orders (id, amount, payer_id, payee_id) VALUES (%(id)s, %(amount)s, %(payer_id)s, %(payee_id)s)
-    RETURNING id
-"""
-
 # endregion
 
 # region Order
 
+insert_order_stmt: LiteralString = """
+    INSERT INTO orders (id, amount, payer_id, payee_id, created_at) VALUES (%(id)s, %(amount)s, %(payer_id)s, %(payee_id)s, %(created_at)s)
+    RETURNING id
+"""
+
 get_order_stmt: LiteralString = """
     SELECT 
-        t.id, t.amount,
+        t.id, t.amount, t.created_at,
         json_build_object(
             'id', u1.id,
             'name', u1.name
@@ -82,7 +82,7 @@ get_order_stmt: LiteralString = """
 
 get_orders_stmt: LiteralString = """
     SELECT 
-        t.id, t.amount,
+        t.id, t.amount, t.created_at,
         json_build_object(
             'id', u1.id,
             'name', u1.name

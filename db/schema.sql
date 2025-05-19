@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS orders
     id UUID PRIMARY KEY,
     amount DECIMAL(9, 2) NOT NULL CHECK (amount >= 0 AND amount <= 1000000),
     payer_id UUID REFERENCES users (id) NOT NULL,
-    payee_id UUID REFERENCES users (id) NOT NULL
+    payee_id UUID REFERENCES users (id) NOT NULL,
+    created_at TIMESTAMP NOT NULL
 );
 
 

@@ -75,6 +75,7 @@ def order(order_id, payer_response, payee_response):
         amount=Decimal("100.00"),
         payer=payer_response,
         payee=payee_response,
+        created_at=pytest.import_("datetime").datetime.now(),
     )
 
 
