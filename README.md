@@ -31,6 +31,17 @@ make start-db
 
 ![schema.png](docs/schema.png)
 
+**Summary**:
+- TODO:
+
+Users Table (users): Stores individual user details.
+Companies Table (companies): Acts as a lookup table, meaning it contains predefined company records.
+Users_Companies Table (users_companies): A junction table that links users to companies.
+
+- A single user has a single profession (1:1)
+- A single user can have multiple documents (1:N)
+- A single user can be assigned to multiple companies but a maximum of 3 (N:N)
+
 ### FastAPI with psycopg
 
 Go to [app_psycopg](src/app_psycopg)

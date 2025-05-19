@@ -268,4 +268,46 @@ class Company(BaseModel):
     last_updated_at: Optional[datetime] = None
 
 
+class CompanyShort(BaseModel):
+    id: UUID4
+    name: CompanyName
+
+
+# endregion
+
+# region UserCompanyLink
+
+
+class UserCompanyLinkInput(BaseModel):
+    user_id: UUID4
+    company_id: UUID4
+
+    @computed_field
+    def created_at(self) -> datetime:
+        return datetime.now()
+
+
+class UserCompanyLink(BaseModel):
+    user_id: UUID4
+    company_id: UUID4
+    created_at: datetime
+
+
+class UserCompanyLinkWithCompany(BaseModel):
+    user_id: UUID4
+    company: CompanyShort
+    created_at: datetime
+
+
+class UserCompanyLinkWithUser(BaseModel):
+    company_id: UUID4
+    user_info: UserShort
+    created_at: datetime
+
+
+class UserCompanyLinkResponse(BaseModel):
+    user_id: UUID4
+    company_id: UUID4
+
+
 # endregion

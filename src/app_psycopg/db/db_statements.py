@@ -4,6 +4,7 @@ from typing import LiteralString
 
 insert_user_stmt: LiteralString = """
     INSERT INTO users (id, name, created_at, profession_id) VALUES (%(id)s, %(name)s, %(created_at)s, %(profession_id)s)
+    ON CONFLICT (id) DO NOTHING
     RETURNING id
 """
 
@@ -60,6 +61,7 @@ delete_user_stmt: LiteralString = """
 
 insert_order_stmt: LiteralString = """
     INSERT INTO orders (id, amount, payer_id, payee_id, created_at) VALUES (%(id)s, %(amount)s, %(payer_id)s, %(payee_id)s, %(created_at)s)
+    ON CONFLICT (id) DO NOTHING
     RETURNING id
 """
 
@@ -110,6 +112,7 @@ delete_order_stmt: LiteralString = """
 
 insert_document_stmt: LiteralString = """
     INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)
+    ON CONFLICT (id) DO NOTHING
     RETURNING id
 """
 
@@ -141,6 +144,7 @@ delete_document_stmt: LiteralString = """
 
 insert_profession_stmt: LiteralString = """
     INSERT INTO professions (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
+    ON CONFLICT (id) DO NOTHING
     RETURNING id
 """
 
@@ -172,6 +176,7 @@ delete_profession_stmt: LiteralString = """
 
 insert_company_stmt: LiteralString = """
     INSERT INTO companies (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
+    ON CONFLICT (id) DO NOTHING
     RETURNING id
 """
 
@@ -204,6 +209,58 @@ patch_company_stmt: LiteralString = """
 
 delete_company_stmt: LiteralString = """
     DELETE FROM companies WHERE id = %(id)s
+"""
+
+# endregion
+
+# region UserCompanyLink
+
+get_user_company_link_stmt: LiteralString = """
+    SELECT * FROM users_companies WHERE user_id = %(user_id)s AND company_id = %(company_id)s
+"""
+
+insert_user_company_link_stmt: LiteralString = """
+    INSERT INTO users_companies (user_id, company_id, created_at) 
+    VALUES (%(user_id)s, %(company_id)s, %(created_at)s)
+    ON CONFLICT (user_id, company_id) DO NOTHING
+    RETURNING user_id, company_id
+"""
+
+get_user_company_links_by_user_stmt: LiteralString = """
+    SELECT 
+        uc.user_id, uc.created_at,
+        json_build_object(
+            'id', c.id,
+            'name', c.name
+        ) company
+    FROM users_companies uc
+    JOIN companies c ON uc.company_id = c.id
+    WHERE uc.user_id = %(user_id)s
+"""
+
+get_user_company_links_by_company_stmt: LiteralString = """
+    SELECT 
+        uc.company_id, uc.created_at,
+        json_build_object(
+            'id', u.id,
+            'name', u.name
+        ) user_info
+    FROM users_companies uc
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.company_id = %(company_id)s
+"""
+
+get_user_company_links_count_by_user_stmt: LiteralString = """
+    SELECT COUNT(*) FROM users_companies WHERE user_id = %(user_id)s
+"""
+
+get_user_company_links_count_by_company_stmt: LiteralString = """
+    SELECT COUNT(*) FROM users_companies WHERE company_id = %(company_id)s
+"""
+
+delete_user_company_link_stmt: LiteralString = """
+    DELETE FROM users_companies 
+    WHERE user_id = %(user_id)s AND company_id = %(company_id)s
 """
 
 # endregion

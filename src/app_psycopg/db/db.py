@@ -1,4 +1,4 @@
-from typing import TypeVar, List, cast
+from typing import TypeVar, List, cast, Tuple
 
 from psycopg import AsyncConnection
 from psycopg.abc import Query
@@ -22,6 +22,10 @@ from app_psycopg.api.models import (
     CompanyUpdate,
     Company,
     CompanyPatch,
+    UserCompanyLinkInput,
+    UserCompanyLinkWithCompany,
+    UserCompanyLinkWithUser,
+    UserCompanyLink,
 )
 from app_psycopg.api.pagination import create_paginate_query
 from app_psycopg.api.sorting import create_order_by_query
@@ -58,6 +62,13 @@ from app_psycopg.db.db_statements import (
     update_company_stmt,
     patch_company_stmt,
     delete_company_stmt,
+    insert_user_company_link_stmt,
+    get_user_company_links_by_user_stmt,
+    get_user_company_links_by_company_stmt,
+    get_user_company_links_count_by_user_stmt,
+    get_user_company_links_count_by_company_stmt,
+    delete_user_company_link_stmt,
+    get_user_company_link_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -74,11 +85,20 @@ class Database:
             await cursor.execute(query=query, params=kwargs)
             return await cursor.fetchone()
 
-    async def _insert_resource(self, query: Query, data: BaseModel) -> UUID4:
+    async def _insert_resource(self, query: Query, data: BaseModel) -> UUID4 | None:
         async with self.conn.cursor() as cursor:
             await cursor.execute(query=query, params=data.model_dump())
             data_out: tuple = await cursor.fetchone()
-            return data_out[0]
+            return data_out[0] if data_out else None
+
+    async def _insert_joint_resource(
+        self, query: Query, data: BaseModel
+    ) -> Tuple[UUID4, UUID4] | None:
+        async with self.conn.cursor() as cursor:
+            await cursor.execute(query=query, params=data.model_dump())
+            data_out: tuple = await cursor.fetchone()
+
+            return data_out if data_out else None
 
     async def _update_resource(
         self, query: Query, update: BaseModel, **kwargs
@@ -120,9 +140,9 @@ class Database:
             )
             return await cursor.fetchall()
 
-    async def _get_count(self, query: Query) -> int:
+    async def _get_count(self, query: Query, **kwargs) -> int:
         async with self.conn.cursor() as cursor:
-            await cursor.execute(query=query)
+            await cursor.execute(query=query, params=kwargs)
             result = await cursor.fetchone()
             return cast(int, result[0])
 
@@ -250,3 +270,59 @@ class Database:
 
     async def delete_company(self, id: str) -> None:
         return await self._delete_resource(delete_company_stmt, id=id)
+
+    # UserCompanyLink
+
+    async def get_user_company_link(
+        self, user_id: UUID4, company_id: UUID4
+    ) -> UserCompanyLink:
+        return await self._get_resource(
+            query=get_user_company_link_stmt,
+            user_id=user_id,
+            company_id=company_id,
+            model_class=UserCompanyLink,
+        )
+
+    async def insert_user_company_link(
+        self, data: UserCompanyLinkInput
+    ) -> Tuple[UUID4, UUID4] | None:
+        return await self._insert_joint_resource(
+            query=insert_user_company_link_stmt, data=data
+        )
+
+    async def get_user_company_links_by_user(
+        self, user_id: UUID4, **kwargs
+    ) -> List[UserCompanyLinkWithCompany]:
+        query: Query = get_user_company_links_by_user_stmt
+
+        kwargs["user_id"] = user_id
+
+        return await self._get_resources(
+            query=query, model_class=UserCompanyLinkWithCompany, **kwargs
+        )
+
+    async def get_user_company_links_by_company(
+        self, company_id: str, **kwargs
+    ) -> List[UserCompanyLinkWithUser]:
+        query: Query = get_user_company_links_by_company_stmt
+
+        kwargs["company_id"] = company_id
+
+        return await self._get_resources(
+            query=query, model_class=UserCompanyLinkWithUser, **kwargs
+        )
+
+    async def get_user_company_links_count_by_user(self, user_id: str) -> int:
+        return await self._get_count(
+            query=get_user_company_links_count_by_user_stmt, user_id=user_id
+        )
+
+    async def get_user_company_links_count_by_company(self, company_id: str) -> int:
+        return await self._get_count(
+            query=get_user_company_links_count_by_company_stmt, company_id=company_id
+        )
+
+    async def delete_user_company_link(self, user_id: str, company_id: str) -> None:
+        return await self._delete_resource(
+            query=delete_user_company_link_stmt, user_id=user_id, company_id=company_id
+        )
