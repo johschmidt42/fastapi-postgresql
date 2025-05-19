@@ -4,6 +4,11 @@ CREATE TABLE IF NOT EXISTS profession (
 );
 
 
+CREATE TABLE IF NOT EXISTS companies (
+    id UUID PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS users
 (
     id UUID PRIMARY KEY,
