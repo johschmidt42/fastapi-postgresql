@@ -36,7 +36,7 @@ async def create_profession(
     db: Annotated[Database, Depends(get_db)],
     profession_input: Annotated[ProfessionInput, Depends(validate_profession_input)],
 ) -> UUID4:
-    profession_id: str = await db.insert_profession(profession_input)
+    profession_id: UUID4 = await db.insert_profession(profession_input)
     return profession_id
 
 
@@ -84,7 +84,7 @@ async def update_profession(
     profession: Annotated[Profession, Depends(validate_profession_id)],
     profession_update: Annotated[ProfessionUpdate, Depends(validate_profession_update)],
 ) -> UUID4:
-    profession_id: str = await db.update_profession(
+    profession_id: UUID4 = await db.update_profession(
         id=profession.id, update=profession_update
     )
     return profession_id

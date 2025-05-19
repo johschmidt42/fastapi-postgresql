@@ -3,7 +3,7 @@ from typing import TypeVar, List, cast
 from psycopg import AsyncConnection
 from psycopg.abc import Query
 from psycopg.rows import class_row
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 from app_psycopg.api.models import (
     UserInput,
@@ -46,6 +46,7 @@ from app_psycopg.db.db_statements import (
     update_profession_stmt,
     delete_profession_stmt,
     patch_user_stmt,
+    delete_order_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -62,7 +63,7 @@ class Database:
             await cursor.execute(query=query, params=kwargs)
             return await cursor.fetchone()
 
-    async def _insert_resource(self, query: Query, data: BaseModel) -> str:
+    async def _insert_resource(self, query: Query, data: BaseModel) -> UUID4:
         async with self.conn.cursor() as cursor:
             await cursor.execute(query=query, params=data.model_dump())
             data_out: tuple = await cursor.fetchone()
@@ -70,16 +71,14 @@ class Database:
 
     async def _update_resource(
         self, query: Query, update: BaseModel, **kwargs
-    ) -> str | None:
+    ) -> UUID4:
         async with self.conn.cursor() as cursor:
             kwargs.update(update.model_dump())
             await cursor.execute(query=query, params=kwargs)
             data_out: tuple = await cursor.fetchone()
             return data_out[0]
 
-    async def _patch_resource(
-        self, query: Query, patch: BaseModel, **kwargs
-    ) -> str | None:
+    async def _patch_resource(self, query: Query, patch: BaseModel, **kwargs) -> UUID4:
         async with self.conn.cursor() as cursor:
             kwargs.update(patch.model_dump())
             await cursor.execute(query=query, params=kwargs)
@@ -129,13 +128,13 @@ class Database:
     async def get_user(self, id: str) -> User | None:
         return await self._get_resource(query=get_user_stmt, model_class=User, id=id)
 
-    async def insert_user(self, data: UserInput) -> str:
+    async def insert_user(self, data: UserInput) -> UUID4:
         return await self._insert_resource(query=insert_user_stmt, data=data)
 
-    async def update_user(self, id: str, update: UserUpdate) -> str | None:
+    async def update_user(self, id: str, update: UserUpdate) -> UUID4:
         return await self._update_resource(query=update_user_stmt, update=update, id=id)
 
-    async def patch_user(self, id: str, patch: UserPatch) -> str | None:
+    async def patch_user(self, id: str, patch: UserPatch) -> UUID4:
         return await self._patch_resource(query=patch_user_stmt, patch=patch, id=id)
 
     async def delete_user(self, id: str) -> None:
@@ -143,7 +142,7 @@ class Database:
 
     # Order
 
-    async def insert_order(self, data: OrderInput) -> str:
+    async def insert_order(self, data: OrderInput) -> UUID4:
         return await self._insert_resource(query=insert_order_stmt, data=data)
 
     async def get_order(self, id: str) -> Order | None:
@@ -157,12 +156,15 @@ class Database:
     async def get_orders_count(self) -> int:
         return await self._get_count(query=get_orders_count_stmt)
 
+    async def delete_order(self, id: str) -> None:
+        return await self._delete_resource(delete_order_stmt, id=id)
+
     # Documents
 
-    async def insert_document(self, data: DocumentInput) -> str:
+    async def insert_document(self, data: DocumentInput) -> UUID4:
         return await self._insert_resource(query=insert_document_stmt, data=data)
 
-    async def update_document(self, id: str, update: DocumentUpdate) -> str | None:
+    async def update_document(self, id: str, update: DocumentUpdate) -> UUID4:
         return await self._update_resource(
             query=document_user_stmt, update=update, id=id
         )
@@ -198,10 +200,10 @@ class Database:
             query=get_profession_stmt, model_class=Profession, id=id
         )
 
-    async def insert_profession(self, data: ProfessionInput) -> str:
+    async def insert_profession(self, data: ProfessionInput) -> UUID4:
         return await self._insert_resource(query=insert_profession_stmt, data=data)
 
-    async def update_profession(self, id: str, update: ProfessionUpdate) -> str | None:
+    async def update_profession(self, id: str, update: ProfessionUpdate) -> UUID4:
         return await self._update_resource(
             query=update_profession_stmt, update=update, id=id
         )

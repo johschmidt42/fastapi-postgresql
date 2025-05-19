@@ -15,6 +15,7 @@ from app_psycopg.api.models import (
     ProfessionInput,
     ProfessionUpdate,
     OrderInputValidated,
+    Order,
 )
 from app_psycopg.db.db import Database
 from app_psycopg.api.models import Document
@@ -64,7 +65,7 @@ async def validate_profession_update(
 
 async def validate_user_id(
     db: Annotated[Database, Depends(get_db)],
-    user_id: str,
+    user_id: UUID4,
 ) -> User:
     user: User | None = await db.get_user(user_id)
     if user is None:
@@ -104,7 +105,7 @@ async def validate_user_patch(
 
 
 async def validate_document_id(
-    db: Annotated[Database, Depends(get_db)], document_id: str
+    db: Annotated[Database, Depends(get_db)], document_id: UUID4
 ) -> Document:
     document: Document | None = await db.get_document(document_id)
     if document is None:
@@ -118,6 +119,19 @@ async def validate_document_id(
 # endregion
 
 # region Order
+
+
+async def validate_order_id(
+    db: Annotated[Database, Depends(get_db)],
+    order_id: UUID4,
+) -> Order:
+    order: Order | None = await db.get_order(order_id)
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order '{order_id}' not found!",
+        )
+    return order
 
 
 async def validate_order_input(

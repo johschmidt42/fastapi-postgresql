@@ -43,7 +43,7 @@ async def create_user(
     db: Annotated[Database, Depends(get_db)],
     user_input: Annotated[UserInput, Depends(validate_user_input)],
 ) -> UUID4:
-    user_id: str = await db.insert_user(user_input)
+    user_id: UUID4 = await db.insert_user(user_input)
     return user_id
 
 
@@ -85,7 +85,7 @@ async def update_user(
     user: Annotated[User, Depends(validate_user_id)],
     user_update: Annotated[UserUpdate, Depends(validate_user_update)],
 ) -> UUID4:
-    user_id: str = await db.update_user(id=user.id, update=user_update)
+    user_id: UUID4 = await db.update_user(id=user.id, update=user_update)
     return user_id
 
 
@@ -95,7 +95,7 @@ async def patch_user(
     user: Annotated[User, Depends(validate_user_id)],
     user_patch: Annotated[UserPatch, Depends(validate_user_patch)],
 ) -> UUID4:
-    user_id: str = await db.patch_user(id=user.id, patch=user_patch)
+    user_id: UUID4 = await db.patch_user(id=user.id, patch=user_patch)
     return user_id
 
 

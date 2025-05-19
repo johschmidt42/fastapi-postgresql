@@ -79,6 +79,7 @@ get_order_stmt: LiteralString = """
     JOIN profession p1 ON u1.profession_id = p1.id
     JOIN users u2 ON t.payee_id = u2.id
     JOIN profession p2 ON u2.profession_id = p2.id
+    WHERE t.id = %(id)s
 """
 
 get_orders_stmt: LiteralString = """
@@ -107,6 +108,10 @@ get_orders_stmt: LiteralString = """
 
 get_orders_count_stmt: LiteralString = """
     SELECT COUNT(*) FROM orders
+"""
+
+delete_order_stmt: LiteralString = """
+    DELETE FROM orders WHERE id = %(id)s
 """
 
 # endregion
