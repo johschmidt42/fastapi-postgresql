@@ -152,14 +152,7 @@ class Database:
     async def get_orders(self, **kwargs) -> List[Order]:
         query: Query = get_orders_stmt
 
-        if "limit" in kwargs and "offset" in kwargs:
-            query: Query = create_paginate_query(
-                query=query, limit=kwargs["limit"], offset=kwargs["offset"]
-            )
-
-        return await self._get_resources(
-            query=get_orders_stmt, model_class=Order, **kwargs
-        )
+        return await self._get_resources(query=query, model_class=Order, **kwargs)
 
     async def get_orders_count(self) -> int:
         return await self._get_count(query=get_orders_count_stmt)
