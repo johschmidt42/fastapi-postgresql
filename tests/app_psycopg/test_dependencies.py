@@ -11,6 +11,12 @@ from app_psycopg.api.dependencies import (
     get_conn,
     get_db,
     validate_order_input,
+    validate_profession_id,
+    validate_profession_input,
+    validate_profession_update,
+    validate_user_input,
+    validate_user_update,
+    validate_user_patch,
 )
 from app_psycopg.api.models import OrderInputValidated
 from app_psycopg.db.db import Database
@@ -20,6 +26,11 @@ from app_psycopg.api.models import (
     User,
     Profession,
     ProfessionShort,
+    ProfessionInput,
+    ProfessionUpdate,
+    UserInput,
+    UserUpdate,
+    UserPatch,
 )
 from polyfactory.factories.pydantic_factory import ModelFactory
 
@@ -165,6 +176,149 @@ async def test_validate_user_id_not_found():
     assert exc_info.value.status_code == 404
     assert f"User '{user_id}' not found!" in exc_info.value.detail
     mock_db.get_user.assert_called_once_with(user_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_profession_id_success():
+    """Test validate_profession_id when profession exists."""
+    # Arrange
+    profession_id = uuid.uuid4()
+    profession = ProfessionFactory.build(id=profession_id)
+
+    mock_db = AsyncMock()
+    mock_db.get_profession.return_value = profession
+
+    # Act
+    result = await validate_profession_id(db=mock_db, profession_id=profession_id)
+
+    # Assert
+    assert result == profession
+    mock_db.get_profession.assert_called_once_with(profession_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_profession_id_not_found():
+    """Test validate_profession_id when profession does not exist."""
+    # Arrange
+    profession_id = uuid.uuid4()
+
+    mock_db = AsyncMock()
+    mock_db.get_profession.return_value = None
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_profession_id(db=mock_db, profession_id=profession_id)
+
+    assert exc_info.value.status_code == 404
+    assert f"Profession '{profession_id}' not found!" in exc_info.value.detail
+    mock_db.get_profession.assert_called_once_with(profession_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_profession_input():
+    """Test validate_profession_input."""
+    # Arrange
+    profession_input = ProfessionInput(name="Test Profession")
+
+    # Act
+    result = await validate_profession_input(profession_input=profession_input)
+
+    # Assert
+    assert result == profession_input
+
+
+@pytest.mark.asyncio
+async def test_validate_profession_update():
+    """Test validate_profession_update."""
+    # Arrange
+    profession_update = ProfessionUpdate(name="Updated Profession")
+
+    # Act
+    result = await validate_profession_update(profession_update=profession_update)
+
+    # Assert
+    assert result == profession_update
+
+
+@pytest.mark.asyncio
+async def test_validate_user_input():
+    """Test validate_user_input."""
+    # Arrange
+    profession_id = uuid.uuid4()
+    user_input = UserInput(name="Test User", profession_id=profession_id)
+    profession = ProfessionFactory.build(id=profession_id)
+
+    mock_db = AsyncMock()
+
+    # Mock validate_profession_id to return the profession
+    with patch("app_psycopg.api.dependencies.validate_profession_id") as mock_validate:
+        mock_validate.return_value = profession
+
+        # Act
+        result = await validate_user_input(db=mock_db, user_input=user_input)
+
+        # Assert
+        assert result == user_input
+        mock_validate.assert_called_once_with(db=mock_db, profession_id=profession_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_user_update():
+    """Test validate_user_update."""
+    # Arrange
+    profession_id = uuid.uuid4()
+    user_update = UserUpdate(name="Updated User", profession_id=profession_id)
+    profession = ProfessionFactory.build(id=profession_id)
+
+    mock_db = AsyncMock()
+
+    # Mock validate_profession_id to return the profession
+    with patch("app_psycopg.api.dependencies.validate_profession_id") as mock_validate:
+        mock_validate.return_value = profession
+
+        # Act
+        result = await validate_user_update(db=mock_db, user_update=user_update)
+
+        # Assert
+        assert result == user_update
+        mock_validate.assert_called_once_with(db=mock_db, profession_id=profession_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_user_patch_with_profession():
+    """Test validate_user_patch with profession_id."""
+    # Arrange
+    profession_id = uuid.uuid4()
+    user_patch = UserPatch(name="Patched User", profession_id=profession_id)
+    profession = ProfessionFactory.build(id=profession_id)
+
+    mock_db = AsyncMock()
+
+    # Mock validate_profession_id to return the profession
+    with patch("app_psycopg.api.dependencies.validate_profession_id") as mock_validate:
+        mock_validate.return_value = profession
+
+        # Act
+        result = await validate_user_patch(db=mock_db, user_patch=user_patch)
+
+        # Assert
+        assert result == user_patch
+        mock_validate.assert_called_once_with(db=mock_db, profession_id=profession_id)
+
+
+@pytest.mark.asyncio
+async def test_validate_user_patch_without_profession():
+    """Test validate_user_patch without profession_id."""
+    # Arrange
+    user_patch = UserPatch(name="Patched User")
+
+    mock_db = AsyncMock()
+
+    # Act
+    result = await validate_user_patch(db=mock_db, user_patch=user_patch)
+
+    # Assert
+    assert result == user_patch
 
 
 @pytest.mark.asyncio
