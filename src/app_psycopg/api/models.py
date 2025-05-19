@@ -78,6 +78,10 @@ class Profession(BaseModel):
     created_at: datetime
     last_updated_at: Optional[datetime] = None
 
+class ProfessionShort(BaseModel):
+    id: UUID4
+    name: ProfessionName
+
 
 # endregion
 
@@ -127,7 +131,11 @@ class User(BaseModel):
     name: UserName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
-    profession: Profession
+    profession: ProfessionShort
+
+class UserShort(BaseModel):
+    id: UUID4
+    name: UserName
 
 
 # endregion
@@ -162,8 +170,8 @@ class OrderInputValidated(BaseModel):
 class Order(BaseModel):
     id: UUID4
     amount: OrderAmount
-    payer: User
-    payee: User
+    payer: UserShort
+    payee: UserShort
 
 
 # endregion
