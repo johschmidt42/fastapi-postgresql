@@ -58,8 +58,8 @@ async def get_profession(
 )
 async def get_professions(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=50)] = 10,
+    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
     order_by: Annotated[OrderByProfession, Query()] = None,
 ) -> LimitOffsetPage[Profession]:
     professions: List[Profession] = await db.get_professions(

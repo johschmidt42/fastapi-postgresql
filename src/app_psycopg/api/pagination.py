@@ -13,8 +13,8 @@ class LimitOffsetPage(BaseModel, Generic[DataT]):
     items: Sequence[DataT]
     items_count: conint(ge=0)
     total_count: conint(ge=0)
-    limit: conint(ge=1)
-    offset: conint(ge=0)
+    limit: conint(ge=1, le=50)
+    offset: conint(ge=0, le=1000)
 
 
 def create_paginate_query(query: Query, limit: int, offset: int) -> Query:

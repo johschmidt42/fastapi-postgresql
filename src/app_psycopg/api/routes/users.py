@@ -60,8 +60,8 @@ async def get_user(
 )
 async def get_users(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=50)] = 10,
+    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
     order_by: Annotated[OrderByUser, Query()] = None,
 ) -> LimitOffsetPage[User]:
     users: List[User] = await db.get_users(

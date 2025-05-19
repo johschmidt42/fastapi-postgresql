@@ -53,8 +53,8 @@ async def get_document(
 )
 async def get_documents(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
+    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
     order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> LimitOffsetPage[Document]:
     documents: List[Document] = await db.get_documents(

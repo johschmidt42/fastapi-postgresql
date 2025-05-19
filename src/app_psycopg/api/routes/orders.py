@@ -51,8 +51,8 @@ async def get_order(
 )
 async def get_orders(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
+    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
     order_by: Annotated[OrderByOrder, Query()] = None,
 ) -> LimitOffsetPage[Order]:
     orders: List[Order] = await db.get_orders(
