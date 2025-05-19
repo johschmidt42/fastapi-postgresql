@@ -6,13 +6,13 @@ from pydantic import AfterValidator
 from app_psycopg.api.dependencies import get_db, validate_document_id
 from app_psycopg.api.models import (
     DocumentInput,
-    DocumentResponseModel,
+    Document,
     DocumentUpdate,
 )
 from app_psycopg.api.pagination import LimitOffsetPage
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import Document
+
 
 router: APIRouter = APIRouter(
     tags=["Documents"],
@@ -37,18 +37,18 @@ async def create_document(
 
 @router.get(
     path="/{document_id}",
-    response_model=DocumentResponseModel,
+    response_model=Document,
     status_code=status.HTTP_200_OK,
 )
 async def get_document(
     document: Annotated[Document, Depends(validate_document_id)],
-) -> DocumentResponseModel:
-    return DocumentResponseModel.model_validate(document)
+) -> Document:
+    return Document.model_validate(document)
 
 
 @router.get(
     path="",
-    response_model=LimitOffsetPage[DocumentResponseModel],
+    response_model=LimitOffsetPage[Document],
     status_code=status.HTTP_200_OK,
 )
 async def get_documents(
@@ -56,14 +56,14 @@ async def get_documents(
     limit: Annotated[int, Query(ge=1)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
     order_by: Annotated[OrderByDocument, Query()] = None,
-) -> LimitOffsetPage[DocumentResponseModel]:
+) -> LimitOffsetPage[Document]:
     documents: List[Document] = await db.get_documents(
         limit=limit, offset=offset, order_by=order_by
     )
     total: int = await db.get_documents_count()
 
-    items: List[DocumentResponseModel] = [
-        DocumentResponseModel.model_validate(document) for document in documents
+    items: List[Document] = [
+        Document.model_validate(document) for document in documents
     ]
 
     return LimitOffsetPage(

@@ -6,16 +6,15 @@ from fastapi.testclient import TestClient
 from polyfactory.factories.pydantic_factory import ModelFactory
 from starlette import status
 
-from app_psycopg.api.models import DocumentResponseModel
-from app_psycopg.db.db_models import Document
+from app_psycopg.api.models import Document
 
 
 class DocumentFactory(ModelFactory[Document]):
     __model__ = Document
 
 
-class DocumentResponseFactory(ModelFactory[DocumentResponseModel]):
-    __model__ = DocumentResponseModel
+class DocumentResponseFactory(ModelFactory[Document]):
+    __model__ = Document
 
 
 @pytest.fixture

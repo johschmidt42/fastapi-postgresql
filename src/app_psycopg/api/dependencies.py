@@ -3,11 +3,19 @@ from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, Request, HTTPException, Body
 from psycopg import Connection, AsyncConnection
+from pydantic import UUID4
 from starlette import status
 
-from app_psycopg.api.models import OrderInput
+from app_psycopg.api.models import (
+    OrderInput,
+    UserInput,
+    User,
+    Profession,
+    UserUpdate,
+    UserPatch,
+)
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User, Document
+from app_sqlalchemy.db.db_models import Document
 
 
 async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
@@ -15,8 +23,21 @@ async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
         yield connection
 
 
-def get_db(conn: Annotated[AsyncConnection, Depends(get_conn)]) -> Database:
+async def get_db(conn: Annotated[AsyncConnection, Depends(get_conn)]) -> Database:
     return Database(conn)
+
+
+async def validate_profession_id(
+    db: Annotated[Database, Depends(get_db)],
+    profession_id: UUID4,
+) -> Profession:
+    profession: Profession | None = await db.get_profession(profession_id)
+    if profession is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Profession '{profession_id}' not found!",
+        )
+    return profession
 
 
 async def validate_user_id(
@@ -29,6 +50,30 @@ async def validate_user_id(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"User '{user_id}' not found!"
         )
     return user
+
+
+async def validate_user_input(
+    db: Annotated[Database, Depends(get_db)], user_input: UserInput
+) -> UserInput:
+    await validate_profession_id(db=db, profession_id=user_input.profession_id)
+    return user_input
+
+
+async def validate_user_update(
+    db: Annotated[Database, Depends(get_db)],
+    user_update: UserUpdate,
+) -> UserUpdate:
+    await validate_profession_id(db=db, profession_id=user_update.profession_id)
+    return user_update
+
+
+async def validate_user_patch(
+    db: Annotated[Database, Depends(get_db)],
+    user_patch: UserPatch,
+) -> UserPatch:
+    if user_patch.profession_id:
+        await validate_profession_id(db=db, profession_id=user_patch.profession_id)
+    return user_patch
 
 
 async def validate_document_id(

@@ -13,10 +13,15 @@ from app_psycopg.api.models import (
     DocumentUpdate,
     ProfessionInput,
     ProfessionUpdate,
+    User,
+    Order,
+    Document,
+    Profession,
+    UserPatch,
 )
 from app_psycopg.api.pagination import create_paginate_query
 from app_psycopg.api.sorting import create_order_by_query
-from app_psycopg.db.db_models import Order, User, Document, Profession
+
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
     get_order_stmt,
@@ -71,6 +76,12 @@ class Database:
             data_out: tuple = await cursor.fetchone()
             return data_out[0]
 
+    async def _patch_resource(
+        self, query, Query, patch: BaseModel, **kwargs
+    ) -> str | None:
+        # TODO:
+        ...
+
     async def _delete_resource(self, query: Query, **kwargs) -> None:
         async with self.conn.cursor() as cursor:
             await cursor.execute(query=query, params=kwargs)
@@ -119,6 +130,9 @@ class Database:
 
     async def update_user(self, id: str, update: UserUpdate) -> str | None:
         return await self._update_resource(query=update_user_stmt, update=update, id=id)
+
+    async def patch_user(self, id: str, patch: UserPatch) -> str | None:
+        return await self._patch_resource(query="TODO", patch=patch, id=id)
 
     async def delete_user(self, id: str) -> None:
         return await self._delete_resource(delete_user_stmt, id=id)

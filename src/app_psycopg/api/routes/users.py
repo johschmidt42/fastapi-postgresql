@@ -1,53 +1,62 @@
 from typing import Annotated, List, Type, Optional, Set
 
-from fastapi import APIRouter, Body, Depends, status, Query
-from pydantic import AfterValidator
+from fastapi import APIRouter, Depends, status, Query
+from pydantic import AfterValidator, UUID4
 
-from app_psycopg.api.dependencies import get_db, validate_user_id
+from app_psycopg.api.dependencies import (
+    get_db,
+    validate_user_id,
+    validate_user_input,
+    validate_user_update,
+    validate_user_patch,
+)
 from app_psycopg.api.models import (
     UserInput,
     UserUpdate,
-    UserResponseModel,
+    User,
+    UserPatch,
 )
 from app_psycopg.api.pagination import LimitOffsetPage
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
-from app_psycopg.db.db_models import User
+
 
 router: APIRouter = APIRouter(
     tags=["Users"],
     prefix="/users",
 )
 
-user_sortable_fields: List[str] = ["name", "created_at", "last_updated_at"]
+user_sortable_fields: List[str] = [
+    "name",
+    "profession",
+    "created_at",
+    "last_updated_at",
+]
 OrderByUser: Type = Annotated[
     Optional[Set[create_order_by_enum(user_sortable_fields)]],
     AfterValidator(validate_order_by_query_params),
 ]
 
 
-@router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
+@router.post(path="", response_model=UUID4, status_code=status.HTTP_201_CREATED)
 async def create_user(
     db: Annotated[Database, Depends(get_db)],
-    user_input: Annotated[UserInput, Body(...)],
-) -> str:
+    user_input: Annotated[UserInput, Depends(validate_user_input)],
+) -> UUID4:
     user_id: str = await db.insert_user(user_input)
-    user: User = await db.get_user(user_id)
-    return user.id
+    return user_id
 
 
-@router.get(
-    path="/{user_id}", response_model=UserResponseModel, status_code=status.HTTP_200_OK
-)
+@router.get(path="/{user_id}", response_model=User, status_code=status.HTTP_200_OK)
 async def get_user(
     user: Annotated[User, Depends(validate_user_id)],
-) -> UserResponseModel:
-    return UserResponseModel.model_validate(user)
+) -> User:
+    return user
 
 
 @router.get(
     path="",
-    response_model=LimitOffsetPage[UserResponseModel],
+    response_model=LimitOffsetPage[User],
     status_code=status.HTTP_200_OK,
 )
 async def get_users(
@@ -55,34 +64,39 @@ async def get_users(
     limit: Annotated[int, Query(ge=1)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
     order_by: Annotated[OrderByUser, Query()] = None,
-) -> LimitOffsetPage[UserResponseModel]:
+) -> LimitOffsetPage[User]:
     users: List[User] = await db.get_users(
         limit=limit, offset=offset, order_by=order_by
     )
     total: int = await db.get_users_count()
 
-    items: List[UserResponseModel] = [
-        UserResponseModel.model_validate(user) for user in users
-    ]
-
     return LimitOffsetPage(
-        items=items,
-        items_count=len(items),
+        items=users,
+        items_count=len(users),
         total_count=total,
         limit=limit,
         offset=offset,
     )
 
 
-@router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)
+@router.put(path="/{user_id}", response_model=UUID4, status_code=status.HTTP_200_OK)
 async def update_user(
     db: Annotated[Database, Depends(get_db)],
     user: Annotated[User, Depends(validate_user_id)],
-    update: Annotated[UserUpdate, Body(...)],
-) -> str:
-    user_id: str = await db.update_user(id=user.id, update=update)
-    user: User = await db.get_user(user_id)
-    return user.id
+    user_update: Annotated[UserUpdate, Depends(validate_user_update)],
+) -> UUID4:
+    user_id: str = await db.update_user(id=user.id, update=user_update)
+    return user_id
+
+
+@router.patch(path="/{user_id}", response_model=UUID4, status_code=status.HTTP_200_OK)
+async def patch_user(
+    db: Annotated[Database, Depends(get_db)],
+    user: Annotated[User, Depends(validate_user_id)],
+    user_patch: Annotated[UserPatch, Depends(validate_user_patch)],
+) -> UUID4:
+    user_id: str = await db.patch_user(id=user.id, patch=user_patch)
+    return user_id
 
 
 @router.delete(

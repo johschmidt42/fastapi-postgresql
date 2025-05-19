@@ -6,12 +6,41 @@ from uuid import uuid4
 from pydantic import (
     BaseModel,
     computed_field,
-    ConfigDict,
     field_serializer,
     StringConstraints,
     Field,
     UUID4,
+    model_validator,
 )
+
+
+class BasePatch(BaseModel):
+    """
+    A base Pydantic model for PATCH requests.
+    It includes a validator to ensure at least one field is provided in the request
+    and sets extra='forbid' by default.
+    """
+
+    model_config = {
+        "extra": "forbid",
+    }
+
+    @model_validator(mode="after")
+    def _check_at_least_one_field_is_set(self):
+        """
+        Validates that at least one field was provided in the request data.
+        `self.model_fields_set` contains the names of fields that were explicitly set in the input.
+        """
+        if not self.model_fields_set:
+            # Dynamically create a list of field names for the current model
+            field_names: str = ", ".join(
+                f"'{field_name}'" for field_name in self.model_fields.keys()
+            )
+
+            error_message = f"At least one of the following fields must be provided for an update: {field_names}."
+
+            raise ValueError(error_message)
+        return self
 
 
 # Profession
@@ -34,11 +63,9 @@ class ProfessionUpdate(BaseModel):
     name: ProfessionName
 
 
-class ProfessionResponseModel(BaseModel):
+class Profession(BaseModel):
     id: UUID4
     name: ProfessionName
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 # User
@@ -73,14 +100,17 @@ class UserUpdate(BaseModel):
         return datetime.now()
 
 
-class UserResponseModel(BaseModel):
+class UserPatch(BasePatch):
+    name: Optional[UserName] = None
+    profession_id: Optional[UUID4] = None
+
+
+class User(BaseModel):
     id: UUID4
     name: UserName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
-    profession_id: UUID4
-
-    model_config = ConfigDict(from_attributes=True)
+    profession: Profession
 
 
 # Order
@@ -100,13 +130,11 @@ class OrderInput(BaseModel):
         return uuid4()
 
 
-class OrderResponseModel(BaseModel):
+class Order(BaseModel):
     id: UUID4
     amount: OrderAmount
-    payer: UserResponseModel
-    payee: UserResponseModel
-
-    model_config = ConfigDict(from_attributes=True)
+    payer: User
+    payee: User
 
 
 # Document
@@ -142,10 +170,8 @@ class DocumentUpdate(BaseModel):
         return json.dumps(document)
 
 
-class DocumentResponseModel(BaseModel):
+class Document(BaseModel):
     id: UUID4
     document: NonEmptyDict
     created_at: datetime
     last_updated_at: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True)

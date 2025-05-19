@@ -7,20 +7,19 @@ from polyfactory.factories.pydantic_factory import ModelFactory
 from starlette import status
 
 from app_psycopg.api.dependencies import ValidatedOrder
-from app_psycopg.api.models import OrderInput, UserResponseModel, OrderResponseModel
-from app_psycopg.db.db_models import User
+from app_psycopg.api.models import OrderInput, User, Order
 
 
 class UserFactory(ModelFactory[User]):
     __model__ = User
 
 
-class UserResponseFactory(ModelFactory[UserResponseModel]):
-    __model__ = UserResponseModel
+class UserResponseFactory(ModelFactory[User]):
+    __model__ = User
 
 
-class OrderResponseFactory(ModelFactory[OrderResponseModel]):
-    __model__ = OrderResponseModel
+class OrderResponseFactory(ModelFactory[Order]):
+    __model__ = Order
 
 
 @pytest.fixture

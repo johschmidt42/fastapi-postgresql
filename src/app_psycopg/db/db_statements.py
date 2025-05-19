@@ -6,7 +6,11 @@ insert_user_stmt: LiteralString = """
 """
 
 get_users_stmt: LiteralString = """
-    SELECT * FROM users
+    SELECT 
+        u.id, u.name, u.created_at, u.last_updated_at,
+        row_to_json(p.*) profession
+    FROM users u
+    JOIN profession p ON u.profession_id = p.id
 """
 
 get_users_count_stmt: LiteralString = """
@@ -14,7 +18,12 @@ get_users_count_stmt: LiteralString = """
 """
 
 get_user_stmt: LiteralString = """
-    SELECT * FROM users WHERE id = %(id)s
+    SELECT 
+        u.id, u.name, u.created_at, u.last_updated_at,
+        row_to_json(p.*) profession
+    FROM users u
+    JOIN profession p ON u.profession_id = p.id
+    WHERE u.id = %(id)s
 """
 
 update_user_stmt: LiteralString = """
