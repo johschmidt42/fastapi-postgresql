@@ -13,6 +13,8 @@ from app_psycopg.api.models import (
     Profession,
     UserUpdate,
     UserPatch,
+    ProfessionInput,
+    ProfessionUpdate,
 )
 from app_psycopg.db.db import Database
 from app_sqlalchemy.db.db_models import Document
@@ -105,3 +107,15 @@ async def validate_order_input(
     payee: User = await validate_user_id(db=db, user_id=order_input.payee_id)
 
     return ValidatedOrder(order_input=order_input, payer=payer, payee=payee)
+
+
+async def validate_profession_input(
+    profession_input: Annotated[ProfessionInput, Body(...)],
+) -> ProfessionInput:
+    return profession_input
+
+
+async def validate_profession_update(
+    profession_update: Annotated[ProfessionUpdate, Body(...)],
+) -> ProfessionUpdate:
+    return profession_update
