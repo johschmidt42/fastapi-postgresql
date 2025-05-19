@@ -15,7 +15,7 @@ get_users_stmt: LiteralString = """
             'name', p.name
         ) profession
     FROM users u
-    JOIN profession p ON u.profession_id = p.id
+    JOIN professions p ON u.profession_id = p.id
 """
 
 get_users_count_stmt: LiteralString = """
@@ -30,7 +30,7 @@ get_user_stmt: LiteralString = """
             'name', p.name
         ) profession
     FROM users u
-    JOIN profession p ON u.profession_id = p.id
+    JOIN professions p ON u.profession_id = p.id
     WHERE u.id = %(id)s
 """
 
@@ -140,30 +140,30 @@ delete_document_stmt: LiteralString = """
 # region Profession
 
 insert_profession_stmt: LiteralString = """
-    INSERT INTO profession (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
+    INSERT INTO professions (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
     RETURNING id
 """
 
 get_profession_stmt: LiteralString = """
-    SELECT * FROM profession WHERE id = %(id)s
+    SELECT * FROM professions WHERE id = %(id)s
 """
 
 get_professions_stmt: LiteralString = """
-    SELECT * FROM profession
+    SELECT * FROM professions
 """
 
 get_professions_count_stmt: LiteralString = """
-    SELECT COUNT(*) FROM profession
+    SELECT COUNT(*) FROM professions
 """
 
 update_profession_stmt: LiteralString = """
-    UPDATE profession SET (name, last_updated_at) = (%(name)s, %(last_updated_at)s)
+    UPDATE professions SET (name, last_updated_at) = (%(name)s, %(last_updated_at)s)
     WHERE id = %(id)s
     RETURNING id
 """
 
 delete_profession_stmt: LiteralString = """
-    DELETE FROM profession WHERE id = %(id)s
+    DELETE FROM professions WHERE id = %(id)s
 """
 
 # endregion

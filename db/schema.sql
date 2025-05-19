@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS profession (
+CREATE TABLE IF NOT EXISTS professions (
     id UUID PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS profession (
 
 CREATE TABLE IF NOT EXISTS companies (
     id UUID PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    last_updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users
@@ -17,9 +19,8 @@ CREATE TABLE IF NOT EXISTS users
     name VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     last_updated_at TIMESTAMP,
-    profession_id UUID REFERENCES profession (id) NOT NULL
+    profession_id UUID REFERENCES professions (id) NOT NULL
 );
-
 
 CREATE TABLE IF NOT EXISTS orders
 (

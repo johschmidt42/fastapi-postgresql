@@ -1,5 +1,5 @@
 -- Insert professions
-INSERT INTO profession (id, name, created_at, last_updated_at)
+INSERT INTO professions (id, name, created_at, last_updated_at)
 VALUES (gen_random_uuid(), 'Engineer', now(), NULL),
 (gen_random_uuid(), 'Doctor', now(), NULL),
 (gen_random_uuid(), 'Artist', now(), NULL);
@@ -8,121 +8,121 @@ VALUES (gen_random_uuid(), 'Engineer', now(), NULL),
 INSERT INTO users (id, name, created_at, last_updated_at, profession_id)
 VALUES (
     gen_random_uuid(), 'Alice', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Bob', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Charlie', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Diana', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Eve', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Frank', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Grace', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Hannah', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Isaac', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Jack', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Kevin', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Lily', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Mia', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Nathan', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Olivia', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Paul', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Quinn', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Ryan', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Sophia', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 ),
 (
     gen_random_uuid(), 'Tom', now(), NULL, (
-        SELECT id FROM profession
+        SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
 );
