@@ -185,6 +185,50 @@ VALUES (
     now()
 );
 
+-- Insert companies
+INSERT INTO companies (id, name, created_at, last_updated_at)
+VALUES (gen_random_uuid(), 'Acme Corporation', now(), NULL),
+(gen_random_uuid(), 'Globex', now(), NULL),
+(gen_random_uuid(), 'Soylent Corp', now(), NULL),
+(gen_random_uuid(), 'Initech', now(), NULL),
+(gen_random_uuid(), 'Umbrella Corporation', now(), NULL),
+(gen_random_uuid(), 'Stark Industries', now(), NULL),
+(gen_random_uuid(), 'Wayne Enterprises', now(), NULL),
+(gen_random_uuid(), 'Cyberdyne Systems', now(), NULL),
+(gen_random_uuid(), 'Oscorp', now(), NULL),
+(gen_random_uuid(), 'LexCorp', now(), NULL),
+(gen_random_uuid(), 'Massive Dynamic', now(), NULL),
+(gen_random_uuid(), 'Aperture Science', now(), NULL);
+
+-- Insert users_companies (assigning 1-3 companies to each user)
+DO $$
+DECLARE
+    user_id UUID;
+    company_id UUID;
+    num_companies INT;
+BEGIN
+    -- For each user
+    FOR user_id IN SELECT id FROM users LOOP
+        -- Assign 1-3 companies randomly
+        num_companies := floor(random() * 3) + 1;
+
+        FOR i IN 1..num_companies LOOP
+            -- Get a random company
+            SELECT id INTO company_id FROM companies
+            ORDER BY random() LIMIT 1;
+
+            -- Insert the relationship if it doesn't exist yet
+            BEGIN
+                INSERT INTO users_companies (user_id, company_id, created_at, last_updated_at)
+                VALUES (user_id, company_id, now(), NULL);
+            EXCEPTION WHEN unique_violation THEN
+                -- If this relationship already exists, try another company
+                CONTINUE;
+            END;
+        END LOOP;
+    END LOOP;
+END $$;
+
 -- Insert documents
 INSERT INTO documents (id, document, created_at, last_updated_at)
 VALUES (
