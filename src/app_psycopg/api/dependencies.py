@@ -16,6 +16,10 @@ from app_psycopg.api.models import (
     ProfessionUpdate,
     OrderInputValidated,
     Order,
+    Company,
+    CompanyInput,
+    CompanyUpdate,
+    CompanyPatch,
 )
 from app_psycopg.db.db import Database
 from app_psycopg.api.models import Document
@@ -144,6 +148,42 @@ async def validate_order_input(
     payee: User = await validate_user_id(db=db, user_id=order_input.payee_id)
 
     return OrderInputValidated(order_input=order_input, payer=payer, payee=payee)
+
+
+# endregion
+
+# region Company
+
+
+async def validate_company_id(
+    db: Annotated[Database, Depends(get_db)],
+    company_id: UUID4,
+) -> Company:
+    company: Company | None = await db.get_company(company_id)
+    if company is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Company '{company_id}' not found!",
+        )
+    return company
+
+
+async def validate_company_input(
+    company_input: Annotated[CompanyInput, Body(...)],
+) -> CompanyInput:
+    return company_input
+
+
+async def validate_company_update(
+    company_update: Annotated[CompanyUpdate, Body(...)],
+) -> CompanyUpdate:
+    return company_update
+
+
+async def validate_company_patch(
+    company_patch: Annotated[CompanyPatch, Body(...)],
+) -> CompanyPatch:
+    return company_patch
 
 
 # endregion

@@ -18,6 +18,10 @@ from app_psycopg.api.models import (
     Document,
     Profession,
     UserPatch,
+    CompanyInput,
+    CompanyUpdate,
+    Company,
+    CompanyPatch,
 )
 from app_psycopg.api.pagination import create_paginate_query
 from app_psycopg.api.sorting import create_order_by_query
@@ -47,6 +51,13 @@ from app_psycopg.db.db_statements import (
     delete_profession_stmt,
     patch_user_stmt,
     delete_order_stmt,
+    insert_company_stmt,
+    get_company_stmt,
+    get_companies_stmt,
+    get_companies_count_stmt,
+    update_company_stmt,
+    patch_company_stmt,
+    delete_company_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -210,3 +221,32 @@ class Database:
 
     async def delete_profession(self, id: str) -> None:
         return await self._delete_resource(delete_profession_stmt, id=id)
+
+    # Company
+
+    async def get_companies(self, **kwargs) -> List[Company]:
+        query: Query = get_companies_stmt
+
+        return await self._get_resources(query=query, model_class=Company, **kwargs)
+
+    async def get_companies_count(self) -> int:
+        return await self._get_count(query=get_companies_count_stmt)
+
+    async def get_company(self, id: str) -> Company | None:
+        return await self._get_resource(
+            query=get_company_stmt, model_class=Company, id=id
+        )
+
+    async def insert_company(self, data: CompanyInput) -> UUID4:
+        return await self._insert_resource(query=insert_company_stmt, data=data)
+
+    async def update_company(self, id: str, update: CompanyUpdate) -> UUID4:
+        return await self._update_resource(
+            query=update_company_stmt, update=update, id=id
+        )
+
+    async def patch_company(self, id: str, patch: CompanyPatch) -> UUID4:
+        return await self._patch_resource(query=patch_company_stmt, patch=patch, id=id)
+
+    async def delete_company(self, id: str) -> None:
+        return await self._delete_resource(delete_company_stmt, id=id)

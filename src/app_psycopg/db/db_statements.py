@@ -167,3 +167,43 @@ delete_profession_stmt: LiteralString = """
 """
 
 # endregion
+
+# region Company
+
+insert_company_stmt: LiteralString = """
+    INSERT INTO companies (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
+    RETURNING id
+"""
+
+get_company_stmt: LiteralString = """
+    SELECT * FROM companies WHERE id = %(id)s
+"""
+
+get_companies_stmt: LiteralString = """
+    SELECT * FROM companies
+"""
+
+get_companies_count_stmt: LiteralString = """
+    SELECT COUNT(*) FROM companies
+"""
+
+update_company_stmt: LiteralString = """
+    UPDATE companies SET (name, last_updated_at) = (%(name)s, %(last_updated_at)s)
+    WHERE id = %(id)s
+    RETURNING id
+"""
+
+patch_company_stmt: LiteralString = """
+    UPDATE companies
+    SET 
+        name = COALESCE(%(name)s, name),
+        last_updated_at = %(last_updated_at)s
+    WHERE id = %(id)s
+    RETURNING id
+"""
+
+delete_company_stmt: LiteralString = """
+    DELETE FROM companies WHERE id = %(id)s
+"""
+
+# endregion

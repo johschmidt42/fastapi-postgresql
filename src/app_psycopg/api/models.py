@@ -224,3 +224,48 @@ class Document(BaseModel):
 
 
 # endregion
+
+# region Company
+
+CompanyName: Type = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=50),
+]
+
+
+class CompanyInput(BaseModel):
+    name: CompanyName
+
+    @computed_field
+    def id(self) -> UUID4:
+        return uuid4()
+
+    @computed_field
+    def created_at(self) -> datetime:
+        return datetime.now()
+
+
+class CompanyUpdate(BaseModel):
+    name: CompanyName
+
+    @computed_field
+    def last_updated_at(self) -> datetime:
+        return datetime.now()
+
+
+class CompanyPatch(BasePatch):
+    name: Optional[CompanyName] = None
+
+    @computed_field
+    def last_updated_at(self) -> datetime:
+        return datetime.now()
+
+
+class Company(BaseModel):
+    id: UUID4
+    name: CompanyName
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
+
+
+# endregion
