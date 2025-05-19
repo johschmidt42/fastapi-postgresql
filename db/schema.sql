@@ -22,6 +22,14 @@ CREATE TABLE IF NOT EXISTS users
     profession_id UUID REFERENCES professions (id) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS user_companies (
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, company_id),
+    created_at TIMESTAMP NOT NULL,
+    last_updated_at TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS orders
 (
     id UUID PRIMARY KEY,
