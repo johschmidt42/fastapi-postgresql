@@ -58,14 +58,24 @@ class ProfessionInput(BaseModel):
     def id(self) -> UUID4:
         return uuid4()
 
+    @computed_field
+    def created_at(self) -> datetime:
+        return datetime.now()
+
 
 class ProfessionUpdate(BaseModel):
     name: ProfessionName
+
+    @computed_field
+    def last_updated_at(self) -> datetime:
+        return datetime.now()
 
 
 class Profession(BaseModel):
     id: UUID4
     name: ProfessionName
+    created_at: datetime
+    last_updated_at: Optional[datetime] = None
 
 
 # User

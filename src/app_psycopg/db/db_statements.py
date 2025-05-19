@@ -111,7 +111,7 @@ delete_document_stmt: LiteralString = """
 # region Profession
 
 insert_profession_stmt: LiteralString = """
-    INSERT INTO profession (id, name) VALUES (%(id)s, %(name)s)
+    INSERT INTO profession (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
     RETURNING id
 """
 
@@ -128,7 +128,7 @@ get_professions_count_stmt: LiteralString = """
 """
 
 update_profession_stmt: LiteralString = """
-    UPDATE profession SET name = %(name)s
+    UPDATE profession SET (name, last_updated_at) = (%(name)s, %(last_updated_at)s)
     WHERE id = %(id)s
     RETURNING id
 """

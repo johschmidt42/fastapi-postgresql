@@ -1,8 +1,8 @@
 -- Insert professions
-INSERT INTO profession (id, name)
-VALUES (gen_random_uuid(), 'Engineer'),
-(gen_random_uuid(), 'Doctor'),
-(gen_random_uuid(), 'Artist');
+INSERT INTO profession (id, name, created_at, last_updated_at)
+VALUES (gen_random_uuid(), 'Engineer', now(), NULL),
+(gen_random_uuid(), 'Doctor', now(), NULL),
+(gen_random_uuid(), 'Artist', now(), NULL);
 
 -- Insert users
 INSERT INTO users (id, name, created_at, last_updated_at, profession_id)

@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS profession (
     id UUID PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    last_updated_at TIMESTAMP
 );
 
 
