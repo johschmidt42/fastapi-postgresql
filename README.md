@@ -11,8 +11,9 @@ This repository demonstrates how to integrate 2 popular **async PostgreSQL libra
 
 - **Database Transaction Handling**: Automatic commits & rollbacks using FastAPI's dependency injection system & context
   managers.
+- **Validations**: Input validation with Pydantic's validators and Depends() functions.
 - **Pagination**: Basic limit offset pagination.
-- **Sorting**: Multi-column sorting via query parameters: `?order_by=+[attr]` for ascending order and
+- **Sorting**: Basic multi-column sorting via query parameters: `?order_by=+[attr]` for ascending order and
   `?order_by=-[attr]`
   for descending order (compatible with OpenAPI).
 - **Filtering**: TODO
