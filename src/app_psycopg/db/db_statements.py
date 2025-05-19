@@ -10,7 +10,10 @@ insert_user_stmt: LiteralString = """
 get_users_stmt: LiteralString = """
     SELECT 
         u.id, u.name, u.created_at, u.last_updated_at,
-        row_to_json(p.*) profession
+        json_build_object(
+            'id', p.id,
+            'name', p.name
+        ) profession
     FROM users u
     JOIN profession p ON u.profession_id = p.id
 """
@@ -22,7 +25,10 @@ get_users_count_stmt: LiteralString = """
 get_user_stmt: LiteralString = """
     SELECT 
         u.id, u.name, u.created_at, u.last_updated_at,
-        row_to_json(p.*) profession
+        json_build_object(
+            'id', p.id,
+            'name', p.name
+        ) profession
     FROM users u
     JOIN profession p ON u.profession_id = p.id
     WHERE u.id = %(id)s
@@ -62,23 +68,15 @@ get_order_stmt: LiteralString = """
         t.id, t.amount,
         json_build_object(
             'id', u1.id,
-            'name', u1.name,
-            'created_at', u1.created_at,
-            'last_updated_at', u1.last_updated_at,
-            'profession', row_to_json(p1.*)
+            'name', u1.name
         ) payer,
         json_build_object(
             'id', u2.id,
-            'name', u2.name,
-            'created_at', u2.created_at,
-            'last_updated_at', u2.last_updated_at,
-            'profession', row_to_json(p2.*)
+            'name', u2.name
         ) payee
     FROM orders t
     JOIN users u1 ON t.payer_id = u1.id
-    JOIN profession p1 ON u1.profession_id = p1.id
     JOIN users u2 ON t.payee_id = u2.id
-    JOIN profession p2 ON u2.profession_id = p2.id
     WHERE t.id = %(id)s
 """
 
@@ -87,23 +85,15 @@ get_orders_stmt: LiteralString = """
         t.id, t.amount,
         json_build_object(
             'id', u1.id,
-            'name', u1.name,
-            'created_at', u1.created_at,
-            'last_updated_at', u1.last_updated_at,
-            'profession', row_to_json(p1.*)
+            'name', u1.name
         ) payer,
         json_build_object(
             'id', u2.id,
-            'name', u2.name,
-            'created_at', u2.created_at,
-            'last_updated_at', u2.last_updated_at,
-            'profession', row_to_json(p2.*)
+            'name', u2.name
         ) payee
     FROM orders t
     JOIN users u1 ON t.payer_id = u1.id
-    JOIN profession p1 ON u1.profession_id = p1.id
     JOIN users u2 ON t.payee_id = u2.id
-    JOIN profession p2 ON u2.profession_id = p2.id
 """
 
 get_orders_count_stmt: LiteralString = """
