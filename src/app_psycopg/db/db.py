@@ -11,10 +11,12 @@ from app_psycopg.api.models import (
     OrderInput,
     DocumentInput,
     DocumentUpdate,
+    ProfessionInput,
+    ProfessionUpdate,
 )
 from app_psycopg.api.pagination import create_paginate_query
 from app_psycopg.api.sorting import create_order_by_query
-from app_psycopg.db.db_models import Order, User, Document
+from app_psycopg.db.db_models import Order, User, Document, Profession
 from app_psycopg.db.db_statements import (
     delete_user_stmt,
     get_order_stmt,
@@ -32,6 +34,12 @@ from app_psycopg.db.db_statements import (
     delete_document_stmt,
     get_documents_count_stmt,
     get_orders_count_stmt,
+    insert_profession_stmt,
+    get_profession_stmt,
+    get_professions_stmt,
+    get_professions_count_stmt,
+    update_profession_stmt,
+    delete_profession_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -163,3 +171,29 @@ class Database:
 
     async def delete_document(self, id: str) -> None:
         return await self._delete_resource(delete_document_stmt, id=id)
+
+    # Profession
+
+    async def get_professions(self, **kwargs) -> List[Profession]:
+        query: Query = get_professions_stmt
+
+        return await self._get_resources(query=query, model_class=Profession, **kwargs)
+
+    async def get_professions_count(self) -> int:
+        return await self._get_count(query=get_professions_count_stmt)
+
+    async def get_profession(self, id: str) -> Profession | None:
+        return await self._get_resource(
+            query=get_profession_stmt, model_class=Profession, id=id
+        )
+
+    async def insert_profession(self, data: ProfessionInput) -> str:
+        return await self._insert_resource(query=insert_profession_stmt, data=data)
+
+    async def update_profession(self, id: str, update: ProfessionUpdate) -> str | None:
+        return await self._update_resource(
+            query=update_profession_stmt, update=update, id=id
+        )
+
+    async def delete_profession(self, id: str) -> None:
+        return await self._delete_resource(delete_profession_stmt, id=id)

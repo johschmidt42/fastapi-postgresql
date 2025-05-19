@@ -14,6 +14,33 @@ from pydantic import (
 )
 
 
+# Profession
+
+ProfessionName: Type = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=50),
+]
+
+
+class ProfessionInput(BaseModel):
+    name: ProfessionName
+
+    @computed_field
+    def id(self) -> UUID4:
+        return uuid4()
+
+
+class ProfessionUpdate(BaseModel):
+    name: ProfessionName
+
+
+class ProfessionResponseModel(BaseModel):
+    id: UUID4
+    name: ProfessionName
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 # User
 
 UserName: Type = Annotated[
@@ -26,6 +53,7 @@ UserName: Type = Annotated[
 
 class UserInput(BaseModel):
     name: UserName
+    profession_id: UUID4
 
     @computed_field
     def id(self) -> UUID4:
@@ -38,6 +66,7 @@ class UserInput(BaseModel):
 
 class UserUpdate(BaseModel):
     name: UserName
+    profession_id: UUID4
 
     @computed_field
     def last_updated_at(self) -> datetime:
@@ -45,10 +74,11 @@ class UserUpdate(BaseModel):
 
 
 class UserResponseModel(BaseModel):
-    id: str
+    id: UUID4
     name: UserName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
+    profession_id: UUID4
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -62,8 +92,8 @@ OrderAmount: Type = Annotated[
 
 class OrderInput(BaseModel):
     amount: OrderAmount
-    payer_id: str
-    payee_id: str
+    payer_id: UUID4
+    payee_id: UUID4
 
     @computed_field
     def id(self) -> UUID4:
@@ -71,7 +101,7 @@ class OrderInput(BaseModel):
 
 
 class OrderResponseModel(BaseModel):
-    id: str
+    id: UUID4
     amount: OrderAmount
     payer: UserResponseModel
     payee: UserResponseModel
@@ -113,7 +143,7 @@ class DocumentUpdate(BaseModel):
 
 
 class DocumentResponseModel(BaseModel):
-    id: str
+    id: UUID4
     document: NonEmptyDict
     created_at: datetime
     last_updated_at: Optional[datetime] = None

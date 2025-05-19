@@ -1,7 +1,7 @@
 from typing import LiteralString
 
 insert_user_stmt: LiteralString = """
-    INSERT INTO users (id, name, created_at) VALUES (%(id)s, %(name)s, %(created_at)s)
+    INSERT INTO users (id, name, created_at, profession_id) VALUES (%(id)s, %(name)s, %(created_at)s, %(profession_id)s)
     RETURNING id
 """
 
@@ -18,7 +18,7 @@ get_user_stmt: LiteralString = """
 """
 
 update_user_stmt: LiteralString = """
-    UPDATE users SET (name, last_updated_at) = (%(name)s, %(last_updated_at)s)
+    UPDATE users SET (name, last_updated_at, profession_id) = (%(name)s, %(last_updated_at)s, %(profession_id)s)
     WHERE id = %(id)s
     RETURNING id
 """
@@ -75,4 +75,33 @@ document_user_stmt: LiteralString = """
 
 delete_document_stmt: LiteralString = """
     DELETE FROM documents WHERE id = %(id)s
+"""
+
+# Profession
+
+insert_profession_stmt: LiteralString = """
+    INSERT INTO profession (id, name) VALUES (%(id)s, %(name)s)
+    RETURNING id
+"""
+
+get_profession_stmt: LiteralString = """
+    SELECT * FROM profession WHERE id = %(id)s
+"""
+
+get_professions_stmt: LiteralString = """
+    SELECT * FROM profession
+"""
+
+get_professions_count_stmt: LiteralString = """
+    SELECT COUNT(*) FROM profession
+"""
+
+update_profession_stmt: LiteralString = """
+    UPDATE profession SET name = %(name)s
+    WHERE id = %(id)s
+    RETURNING id
+"""
+
+delete_profession_stmt: LiteralString = """
+    DELETE FROM profession WHERE id = %(id)s
 """
