@@ -78,12 +78,12 @@ class Database:
     async def _get_resources(
         self, query: Query, model_class: type[T], **kwargs
     ) -> List[T]:
-        if kwargs.get("order_by"):
+        if kwargs.get("order_by") is not None:
             query: Query = create_order_by_query(
                 query=query, order_by_fields=kwargs.get("order_by")
             )
 
-        if kwargs.get("limit") and kwargs.get("offset"):
+        if kwargs.get("limit") is not None and kwargs.get("offset") is not None:
             query: Query = create_paginate_query(
                 query=query, limit=kwargs["limit"], offset=kwargs["offset"]
             )
