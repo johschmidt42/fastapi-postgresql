@@ -1,22 +1,33 @@
 import uuid
 from decimal import Decimal
 from unittest.mock import patch
+from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
 from polyfactory.factories.pydantic_factory import ModelFactory
 from starlette import status
 
-from app_psycopg.api.dependencies import ValidatedOrder
-from app_psycopg.api.models import OrderInput, User, Order
+from app_psycopg.api.models import (
+    OrderInput,
+    User,
+    Order,
+    OrderInputValidated,
+    UserShort,
+    ProfessionShort,
+)
 
 
 class UserFactory(ModelFactory[User]):
     __model__ = User
 
 
-class UserResponseFactory(ModelFactory[User]):
-    __model__ = User
+class ProfessionShortFactory(ModelFactory[ProfessionShort]):
+    __model__ = ProfessionShort
+
+
+class UserShortFactory(ModelFactory[UserShort]):
+    __model__ = UserShort
 
 
 class OrderResponseFactory(ModelFactory[Order]):
@@ -58,13 +69,13 @@ def order_input(payer, payee):
 @pytest.fixture
 def payer_response(payer):
     """Create a test payer user response model."""
-    return UserResponseFactory.build(id=payer.id, name=payer.name)
+    return UserShortFactory.build(id=payer.id, name=payer.name)
 
 
 @pytest.fixture
 def payee_response(payee):
     """Create a test payee user response model."""
-    return UserResponseFactory.build(id=payee.id, name=payee.name)
+    return UserShortFactory.build(id=payee.id, name=payee.name)
 
 
 @pytest.fixture
@@ -75,17 +86,31 @@ def order(order_id, payer_response, payee_response):
         amount=Decimal("100.00"),
         payer=payer_response,
         payee=payee_response,
-        created_at=pytest.import_("datetime").datetime.now(),
+        created_at=datetime.now(),
     )
 
 
 @pytest.fixture
 def validated_order(order_input, payer, payee):
     """Create a validated order."""
-    return ValidatedOrder(
+    # Create proper User objects with ProfessionShort
+    payer_with_profession = UserFactory.build(
+        id=payer.id,
+        name=payer.name,
+        created_at=datetime.now(),
+        profession=ProfessionShortFactory.build(),
+    )
+    payee_with_profession = UserFactory.build(
+        id=payee.id,
+        name=payee.name,
+        created_at=datetime.now(),
+        profession=ProfessionShortFactory.build(),
+    )
+
+    return OrderInputValidated(
         order_input=order_input,
-        payer=payer,
-        payee=payee,
+        payer=payer_with_profession,
+        payee=payee_with_profession,
     )
 
 
@@ -95,10 +120,17 @@ def test_create_order(client: TestClient, mock_db, order, validated_order):
     mock_db.insert_order.return_value = order.id
     mock_db.get_order.return_value = order
 
-    # Patch only the validate_order_input dependency
-    with patch(
-        "app_psycopg.api.routes.orders.validate_order_input",
-        return_value=validated_order,
+    # We need to patch both validate_order_input and validate_user_id
+    # to avoid the validation error
+    with (
+        patch(
+            "app_psycopg.api.dependencies.validate_user_id",
+            side_effect=[validated_order.payer, validated_order.payee],
+        ),
+        patch(
+            "app_psycopg.api.routes.orders.validate_order_input",
+            return_value=validated_order,
+        ),
     ):
         # Make request
         response = client.post(

@@ -11,10 +11,16 @@ from app_psycopg.api.dependencies import (
     get_conn,
     get_db,
     validate_order_input,
-    ValidatedOrder,
 )
+from app_psycopg.api.models import OrderInputValidated
 from app_psycopg.db.db import Database
-from app_psycopg.api.models import OrderInput, Document, User, Profession
+from app_psycopg.api.models import (
+    OrderInput,
+    Document,
+    User,
+    Profession,
+    ProfessionShort,
+)
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 
@@ -30,12 +36,16 @@ class ProfessionFactory(ModelFactory[Profession]):
     __model__ = Profession
 
 
+class ProfessionShortFactory(ModelFactory[ProfessionShort]):
+    __model__ = ProfessionShort
+
+
 class UserFactory(ModelFactory[User]):
     __model__ = User
 
     @classmethod
-    def profession(cls) -> Profession:
-        return ProfessionFactory.build()
+    def profession(cls) -> ProfessionShort:
+        return ProfessionShortFactory.build()
 
 
 class AsyncContextManagerMock:
@@ -179,7 +189,7 @@ async def test_validate_order_input_success():
         result = await validate_order_input(db=mock_db, order_input=order_input)
 
         # Assert
-        assert isinstance(result, ValidatedOrder)
+        assert isinstance(result, OrderInputValidated)
         assert result.order_input == order_input
         assert result.payer == payer
         assert result.payee == payee
