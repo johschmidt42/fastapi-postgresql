@@ -219,8 +219,8 @@ BEGIN
 
             -- Insert the relationship if it doesn't exist yet
             BEGIN
-                INSERT INTO users_companies (user_id, company_id, created_at, last_updated_at)
-                VALUES (user_id, company_id, now(), NULL);
+                INSERT INTO users_companies (user_id, company_id, created_at)
+                VALUES (user_id, company_id, now());
             EXCEPTION WHEN unique_violation THEN
                 -- If this relationship already exists, try another company
                 CONTINUE;

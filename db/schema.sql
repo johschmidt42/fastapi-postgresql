@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS users_companies (
     user_id UUID REFERENCES users (id) ON DELETE CASCADE,
     company_id UUID REFERENCES companies (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, company_id),
-    created_at TIMESTAMP NOT NULL,
-    last_updated_at TIMESTAMP
+    created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS orders
