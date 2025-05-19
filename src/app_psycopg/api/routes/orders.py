@@ -17,8 +17,6 @@ router: APIRouter = APIRouter(
 
 order_sortable_fields: List[str] = [
     "amount",
-    "payer",
-    "payee",
 ]
 OrderByOrder: Type = Annotated[
     Optional[Set[create_order_by_enum(order_sortable_fields)]],

@@ -28,7 +28,6 @@ router: APIRouter = APIRouter(
 
 user_sortable_fields: List[str] = [
     "name",
-    "profession",
     "created_at",
     "last_updated_at",
 ]
