@@ -44,7 +44,7 @@ from app_psycopg.db.db_statements import (
     get_professions_stmt,
     get_professions_count_stmt,
     update_profession_stmt,
-    delete_profession_stmt,
+    delete_profession_stmt, patch_user_stmt,
 )
 
 T: TypeVar = TypeVar("T")
@@ -79,8 +79,11 @@ class Database:
     async def _patch_resource(
         self, query: Query, patch: BaseModel, **kwargs
     ) -> str | None:
-        # TODO:
-        ...
+        async with self.conn.cursor() as cursor:
+            kwargs.update(patch.model_dump(exclude_unset=True))
+            await cursor.execute(query=query, params=kwargs)
+            data_out: tuple = await cursor.fetchone()
+            return data_out[0]
 
     async def _delete_resource(self, query: Query, **kwargs) -> None:
         async with self.conn.cursor() as cursor:
@@ -132,7 +135,7 @@ class Database:
         return await self._update_resource(query=update_user_stmt, update=update, id=id)
 
     async def patch_user(self, id: str, patch: UserPatch) -> str | None:
-        return await self._patch_resource(query="TODO", patch=patch, id=id)
+        return await self._patch_resource(query=patch_user_stmt, patch=patch, id=id)
 
     async def delete_user(self, id: str) -> None:
         return await self._delete_resource(delete_user_stmt, id=id)

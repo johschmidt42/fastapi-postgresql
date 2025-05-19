@@ -1,5 +1,7 @@
 from typing import LiteralString
 
+# User
+
 insert_user_stmt: LiteralString = """
     INSERT INTO users (id, name, created_at, profession_id) VALUES (%(id)s, %(name)s, %(created_at)s, %(profession_id)s)
     RETURNING id
@@ -32,6 +34,12 @@ update_user_stmt: LiteralString = """
     RETURNING id
 """
 
+patch_user_stmt: LiteralString = """
+    UPDATE users SET (name, last_updated_at, profession_id) = (%(name)s, %(last_updated_at)s, %(profession_id)s)
+    WHERE id = %(id)s
+    RETURNING id
+"""
+
 delete_user_stmt: LiteralString = """
     DELETE FROM users WHERE id = %(id)s
 """
@@ -40,6 +48,8 @@ insert_order_stmt: LiteralString = """
     INSERT INTO orders (id, amount, payer_id, payee_id) VALUES (%(id)s, %(amount)s, %(payer_id)s, %(payee_id)s)
     RETURNING id
 """
+
+# Order
 
 get_order_stmt: LiteralString = """
     SELECT 
@@ -58,6 +68,8 @@ get_orders_stmt: LiteralString = """
 get_orders_count_stmt: LiteralString = """
     SELECT COUNT(*) FROM orders
 """
+
+# Document
 
 insert_document_stmt: LiteralString = """
     INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)

@@ -104,6 +104,10 @@ class UserPatch(BasePatch):
     name: Optional[UserName] = None
     profession_id: Optional[UUID4] = None
 
+    @computed_field
+    def last_updated_at(self) -> datetime:
+        return datetime.now()
+
 
 class User(BaseModel):
     id: UUID4
