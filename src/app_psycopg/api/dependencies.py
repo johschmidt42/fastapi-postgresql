@@ -29,6 +29,9 @@ async def get_db(conn: Annotated[AsyncConnection, Depends(get_conn)]) -> Databas
     return Database(conn)
 
 
+# region Profession
+
+
 async def validate_profession_id(
     db: Annotated[Database, Depends(get_db)],
     profession_id: UUID4,
@@ -40,6 +43,23 @@ async def validate_profession_id(
             detail=f"Profession '{profession_id}' not found!",
         )
     return profession
+
+
+async def validate_profession_input(
+    profession_input: Annotated[ProfessionInput, Body(...)],
+) -> ProfessionInput:
+    return profession_input
+
+
+async def validate_profession_update(
+    profession_update: Annotated[ProfessionUpdate, Body(...)],
+) -> ProfessionUpdate:
+    return profession_update
+
+
+# endregion
+
+# region User
 
 
 async def validate_user_id(
@@ -78,6 +98,11 @@ async def validate_user_patch(
     return user_patch
 
 
+# endregion
+
+# region Document
+
+
 async def validate_document_id(
     db: Annotated[Database, Depends(get_db)], document_id: str
 ) -> Document:
@@ -88,6 +113,11 @@ async def validate_document_id(
             detail=f"Document '{document_id}' not found!",
         )
     return document
+
+
+# endregion
+
+# region Order
 
 
 @dataclass(frozen=True)
@@ -109,13 +139,4 @@ async def validate_order_input(
     return ValidatedOrder(order_input=order_input, payer=payer, payee=payee)
 
 
-async def validate_profession_input(
-    profession_input: Annotated[ProfessionInput, Body(...)],
-) -> ProfessionInput:
-    return profession_input
-
-
-async def validate_profession_update(
-    profession_update: Annotated[ProfessionUpdate, Body(...)],
-) -> ProfessionUpdate:
-    return profession_update
+# endregion
