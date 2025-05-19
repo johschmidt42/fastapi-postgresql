@@ -59,7 +59,7 @@ insert_order_stmt: LiteralString = """
 
 get_order_stmt: LiteralString = """
     SELECT 
-        t.*,
+        t.id, t.amount,
         row_to_json(u1.*) payer,
         row_to_json(u2.*) payee
     FROM orders t
