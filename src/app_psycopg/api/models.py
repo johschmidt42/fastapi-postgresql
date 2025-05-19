@@ -78,6 +78,7 @@ class Profession(BaseModel):
     created_at: datetime
     last_updated_at: Optional[datetime] = None
 
+
 class ProfessionShort(BaseModel):
     id: UUID4
     name: ProfessionName
@@ -132,6 +133,7 @@ class User(BaseModel):
     created_at: datetime
     last_updated_at: Optional[datetime] = None
     profession: ProfessionShort
+
 
 class UserShort(BaseModel):
     id: UUID4
