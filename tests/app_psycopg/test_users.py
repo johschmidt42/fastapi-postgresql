@@ -130,3 +130,32 @@ def test_delete_user(client: TestClient, mock_db, user):
     # Assert mock calls
     # The mock is called with the return value of user.id, which is a mock itself
     mock_db.delete_user.assert_called_once()
+
+
+def test_patch_user(client: TestClient, mock_db, user):
+    """Test patching a user."""
+    # Setup mock
+    patched_user = User(
+        id=user.id,
+        name="Patched User",
+        created_at=user.created_at,
+        last_updated_at=user.last_updated_at,
+        profession=user.profession,
+    )
+    mock_db.patch_user.return_value = user.id
+    mock_db.get_user.return_value = patched_user
+
+    # Patch only the validate_user_id dependency
+    with patch("app_psycopg.api.routes.users.validate_user_id", return_value=user):
+        # Make request
+        response = client.patch(
+            f"/users/{user.id}",
+            json={"name": "Patched User"},
+        )
+
+    # Assert response
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == str(user.id)
+
+    # Assert mock calls
+    mock_db.patch_user.assert_called_once()
