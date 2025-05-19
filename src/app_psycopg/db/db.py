@@ -77,7 +77,7 @@ class Database:
             return data_out[0]
 
     async def _patch_resource(
-        self, query, Query, patch: BaseModel, **kwargs
+        self, query: Query, patch: BaseModel, **kwargs
     ) -> str | None:
         # TODO:
         ...
