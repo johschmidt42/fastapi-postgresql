@@ -8,6 +8,7 @@ dependencies = [
     "greenlet>=3.2.1",
     "httpx>=0.28.1",
     "psycopg[pool]>=3.2.6",
+    "reflex>=0.7.12",
     "sqlalchemy>=2.0.40",
     "uvicorn[standard]>=0.34.2",
 ]
