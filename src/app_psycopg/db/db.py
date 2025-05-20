@@ -159,7 +159,7 @@ class Database:
     async def get_user(self, id: str) -> User | None:
         return await self._get_resource(query=get_user_stmt, model_class=User, id=id)
 
-    async def insert_user(self, data: UserInput) -> UUID4:
+    async def insert_user(self, data: UserInput) -> UUID4 | None:
         return await self._insert_resource(query=insert_user_stmt, data=data)
 
     async def update_user(self, id: str, update: UserUpdate) -> UUID4:
@@ -173,7 +173,7 @@ class Database:
 
     # Order
 
-    async def insert_order(self, data: OrderInput) -> UUID4:
+    async def insert_order(self, data: OrderInput) -> UUID4 | None:
         return await self._insert_resource(query=insert_order_stmt, data=data)
 
     async def get_order(self, id: str) -> Order | None:
@@ -192,7 +192,7 @@ class Database:
 
     # Documents
 
-    async def insert_document(self, data: DocumentInput) -> UUID4:
+    async def insert_document(self, data: DocumentInput) -> UUID4 | None:
         return await self._insert_resource(query=insert_document_stmt, data=data)
 
     async def update_document(self, id: str, update: DocumentUpdate) -> UUID4:
@@ -231,7 +231,7 @@ class Database:
             query=get_profession_stmt, model_class=Profession, id=id
         )
 
-    async def insert_profession(self, data: ProfessionInput) -> UUID4:
+    async def insert_profession(self, data: ProfessionInput) -> UUID4 | None:
         return await self._insert_resource(query=insert_profession_stmt, data=data)
 
     async def update_profession(self, id: str, update: ProfessionUpdate) -> UUID4:
@@ -257,7 +257,7 @@ class Database:
             query=get_company_stmt, model_class=Company, id=id
         )
 
-    async def insert_company(self, data: CompanyInput) -> UUID4:
+    async def insert_company(self, data: CompanyInput) -> UUID4 | None:
         return await self._insert_resource(query=insert_company_stmt, data=data)
 
     async def update_company(self, id: str, update: CompanyUpdate) -> UUID4:

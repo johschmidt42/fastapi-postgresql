@@ -1,9 +1,14 @@
 from typing import Annotated, List, Type, Optional, Set
 
-from fastapi import APIRouter, Body, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator, UUID4
 
-from app_psycopg.api.dependencies import get_db, validate_document_id
+from app_psycopg.api.dependencies import (
+    get_db,
+    validate_document_id,
+    validate_document_input,
+    validate_document_update,
+)
 from app_psycopg.api.models import (
     DocumentInput,
     Document,
@@ -29,7 +34,7 @@ OrderByDocument: Type = Annotated[
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
 async def create_document(
     db: Annotated[Database, Depends(get_db)],
-    document_input: Annotated[DocumentInput, Body(...)],
+    document_input: Annotated[DocumentInput, Depends(validate_document_input)],
 ) -> str:
     document_id: UUID4 = await db.insert_document(document_input)
     return document_id
@@ -79,7 +84,7 @@ async def get_documents(
 async def update_document(
     db: Annotated[Database, Depends(get_db)],
     document: Annotated[Document, Depends(validate_document_id)],
-    update: Annotated[DocumentUpdate, Body(...)],
+    update: Annotated[DocumentUpdate, Depends(validate_document_update)],
 ) -> str:
     document_id: UUID4 = await db.update_document(id=document.id, update=update)
     return document_id

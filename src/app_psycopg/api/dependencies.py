@@ -22,9 +22,11 @@ from app_psycopg.api.models import (
     CompanyPatch,
     UserCompanyLinkInput,
     UserCompanyLink,
+    DocumentInput,
+    DocumentUpdate,
+    Document,
 )
 from app_psycopg.db.db import Database
-from app_psycopg.api.models import Document
 
 
 async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
@@ -120,6 +122,21 @@ async def validate_document_id(
             detail=f"Document '{document_id}' not found!",
         )
     return document
+
+
+async def validate_document_input(
+    db: Annotated[Database, Depends(get_db)],
+    document_input: Annotated[DocumentInput, Body(...)],
+) -> DocumentInput:
+    # Validate user_id
+    await validate_user_id(db=db, user_id=document_input.user_id)
+    return document_input
+
+
+async def validate_document_update(
+    document_update: Annotated[DocumentUpdate, Body(...)],
+) -> DocumentUpdate:
+    return document_update
 
 
 # endregion
