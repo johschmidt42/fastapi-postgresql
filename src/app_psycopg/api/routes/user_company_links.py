@@ -1,6 +1,6 @@
 from typing import Annotated, Tuple, List
 
-from fastapi import APIRouter, Depends, status, Path, Query
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import UUID4
 
 from app_psycopg.api.dependencies import (
@@ -48,18 +48,14 @@ async def create_user_company_link(
 )
 async def delete_user_company_link(
     db: Annotated[Database, Depends(get_db)],
-    user_id: Annotated[UUID4, Path(...)],
-    company_id: Annotated[UUID4, Path(...)],
+    user: Annotated[UUID4, Depends(validate_user_id)],
+    company: Annotated[UUID4, Depends(validate_company_id)],
 ) -> None:
-    # Validate user_id
-    await validate_user_id(db=db, user_id=user_id)
-    # Validate company_id
-    await validate_company_id(db=db, company_id=company_id)
     # Validate that the link exists
-    await validate_user_company_link(db=db, user_id=user_id, company_id=company_id)
+    await validate_user_company_link(db=db, user_id=user.id, company_id=company.id)
 
     # Delete the link
-    await db.delete_user_company_link(user_id=user_id, company_id=company_id)
+    await db.delete_user_company_link(user_id=user.id, company_id=company.id)
 
 
 @router.get(
@@ -77,6 +73,9 @@ async def get_user_company_links(
     LimitOffsetPage[UserCompanyLinkWithCompany]
     | LimitOffsetPage[UserCompanyLinkWithUser]
 ):
+    # The validate_get_user_company_links dependency ensures that exactly one of
+    # user_id or company_id is provided, so we can safely use an if-else structure
+
     # If user_id is provided, get companies linked to the user
     if params["user_id"] is not None:
         # Validate that the user exists
@@ -91,29 +90,31 @@ async def get_user_company_links(
             user_id=params["user_id"]
         )
 
-        return LimitOffsetPage(
+        return LimitOffsetPage[UserCompanyLinkWithCompany](
             items=links,
             items_count=len(links),
             total_count=total,
             limit=limit,
             offset=offset,
         )
-
-    # If company_id is provided, get users linked to the company
-    if params["company_id"] is not None:
+    # Else company_id is provided (guaranteed by validate_get_user_company_links)
+    else:
+        # We know company_id is not None here because validate_get_user_company_links
+        # ensures that exactly one of user_id or company_id is provided
+        company_id = params["company_id"]
         # Validate that the company exists
-        await validate_company_id(db=db, company_id=params["company_id"])
+        await validate_company_id(db=db, company_id=company_id)
 
         links: List[
             UserCompanyLinkWithUser
         ] = await db.get_user_company_links_by_company(
-            company_id=params["company_id"], limit=limit, offset=offset
+            company_id=company_id, limit=limit, offset=offset
         )
         total: int = await db.get_user_company_links_count_by_company(
-            company_id=params["company_id"]
+            company_id=company_id
         )
 
-        return LimitOffsetPage(
+        return LimitOffsetPage[UserCompanyLinkWithUser](
             items=links,
             items_count=len(links),
             total_count=total,
