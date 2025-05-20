@@ -230,94 +230,154 @@ BEGIN
 END $$;
 
 -- Insert documents
-INSERT INTO documents (id, document, created_at, last_updated_at)
+INSERT INTO documents (id, document, created_at, last_updated_at, user_id)
 VALUES (
     gen_random_uuid(),
     '{"title": "Doc1", "content": "Sample content 1"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc2", "content": "Sample content 2"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc3", "content": "Sample content 3"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc4", "content": "Sample content 4"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc5", "content": "Sample content 5"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc6", "content": "Sample content 6"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc7", "content": "Sample content 7"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc8", "content": "Sample content 8"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc9", "content": "Sample content 9"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc10", "content": "Sample content 10"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc11", "content": "Sample content 11"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc12", "content": "Sample content 12"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc13", "content": "Sample content 13"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc14", "content": "Sample content 14"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 ),
 (
     gen_random_uuid(),
     '{"title": "Doc15", "content": "Sample content 15"}',
     now(),
-    NULL
+    NULL,
+    (
+        SELECT id FROM users
+        ORDER BY random() LIMIT 1
+    )
 );

@@ -43,5 +43,6 @@ CREATE TABLE IF NOT EXISTS documents (
     id UUID PRIMARY KEY,
     document JSONB,
     created_at TIMESTAMP NOT NULL,
-    last_updated_at TIMESTAMP
+    last_updated_at TIMESTAMP,
+    user_id UUID REFERENCES users (id) NOT NULL
 );
