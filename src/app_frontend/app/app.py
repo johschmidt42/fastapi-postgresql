@@ -1,35 +1,72 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
+from typing import List, Dict, Any, Optional
+
+import httpx
 import reflex as rx
 
-from rxconfig import config
 
 class State(rx.State):
     """The app state."""
 
-    ...
+    success: bool = False
+
+    # Store the list of users
+    users: List[Dict[str, Any]] = []
+
+    # Flag to indicate if data is loading
+    is_loading: bool = False
+
+    # Error message if fetch fails
+    error: Optional[str] = None
+
+    @rx.event
+    async def fetch_users(self):
+        """Fetch users from the API."""
+        self.is_loading = True
+        self.error = None
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("http://localhost:9000/users")
+                if response.status_code == 200:
+                    self.success: bool = True
+                    self.users = response.json()["items"]
+                else:
+                    self.error = f"Error fetching users: {response.status_code}"
+        except Exception as e:
+            self.error = f"Error: {str(e)}"
+        finally:
+            self.is_loading = False
 
 
-def index() -> rx.Component:
-    return rx.container(
-        rx.color_mode.button(position="top-right"),
-        rx.vstack(
-            rx.heading("Welcome to Reflex!", size="9"),
-            rx.text(
-                "Get started by editing ",
-                rx.code(f"{config.app_name}/{config.app_name}.py"),
-                size="5",
-            ),
-            rx.link(
-                rx.button("Check out our docs!"),
-                href="https://reflex.dev/docs/getting-started/introduction/",
-                is_external=True,
-            ),
-            spacing="5",
-            justify="center",
-            min_height="85vh",
+def index():
+    return rx.vstack(
+        rx.button(
+            "Toggle", on_click=State.fetch_users
         ),
-        rx.logo(),
+        rx.cond(
+            State.success,
+            rx.vstack(
+                rx.heading("Users", size="6"),
+                rx.data_table(
+                    data=State.users,
+                    columns=[
+                        "id",
+                        "name",
+                        "created_at",
+                        "last_updated_at",
+                        {"id": "profession.name", "header": "Profession"},
+                    ],
+                    pagination=False,
+                    search=True,
+                    sort=True,
+                ),
+                width="100%",
+                spacing="4",
+            ),
+            rx.text("Text 2", color="red"),
+        ),
     )
 
 
