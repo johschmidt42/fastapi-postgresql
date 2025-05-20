@@ -111,7 +111,7 @@ delete_order_stmt: LiteralString = """
 # region Document
 
 insert_document_stmt: LiteralString = """
-    INSERT INTO documents (id, document, created_at) VALUES (%(id)s, %(document)s, %(created_at)s)
+    INSERT INTO documents (id, document, created_at, user_id) VALUES (%(id)s, %(document)s, %(created_at)s, %(user_id)s)
     ON CONFLICT (id) DO NOTHING
     RETURNING id
 """

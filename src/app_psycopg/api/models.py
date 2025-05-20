@@ -190,6 +190,7 @@ NonEmptyDict: Type = Annotated[dict, Field(min_length=1)]
 
 class DocumentInput(BaseModel):
     document: NonEmptyDict
+    user_id: UUID4
 
     @computed_field
     def id(self) -> UUID4:
@@ -221,6 +222,7 @@ class Document(BaseModel):
     document: NonEmptyDict
     created_at: datetime
     last_updated_at: Optional[datetime] = None
+    user_id: UUID4
 
 
 # endregion
