@@ -1,8 +1,8 @@
-from typing import AsyncGenerator, Annotated
+from typing import AsyncGenerator, Annotated, Optional
 
 from fastapi import Request, Depends, HTTPException, Body
+from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
-from sqlalchemy import select
 from starlette import status
 
 from app_sqlalchemy.api.models import (
@@ -19,6 +19,7 @@ from app_sqlalchemy.api.models import (
     CompanyUpdate,
     CompanyPatch,
     UserCompanyLinkInput,
+    UserCompanyLink,
 )
 from app_sqlalchemy.db.db_models import User, Document, Profession, Company, Order
 
@@ -84,7 +85,6 @@ async def validate_user_input(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     user_input: Annotated[UserInput, Body(...)],
 ) -> UserInput:
-    # Validate profession_id
     await validate_profession_id(
         session=session, profession_id=user_input.profession_id
     )
@@ -95,7 +95,6 @@ async def validate_user_update(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     user_update: Annotated[UserUpdate, Body(...)],
 ) -> UserUpdate:
-    # Validate profession_id
     await validate_profession_id(
         session=session, profession_id=user_update.profession_id
     )
@@ -221,38 +220,56 @@ async def validate_company_patch(
 # region UserCompanyLink
 
 
-async def validate_user_company_link(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-    user_id: str,
-    company_id: str,
-) -> tuple[User, Company]:
-    user = await validate_user_id(session=session, user_id=user_id)
-    company = await validate_company_id(session=session, company_id=company_id)
-
-    # Check if the link exists
-    stmt = select(User).filter(
-        User.id == user_id, User.companies.any(Company.id == company_id)
-    )
-    result = await session.execute(stmt)
-    existing_user = result.scalar_one_or_none()
-
-    if existing_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Link between user '{user_id}' and company '{company_id}' not found!",
-        )
-
-    return user, company
-
-
 async def validate_user_company_link_input(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    link_input: Annotated[UserCompanyLinkInput, Body(...)],
+    user_company_link_input: Annotated[UserCompanyLinkInput, Body(...)],
 ) -> UserCompanyLinkInput:
-    # Validate user_id and company_id
-    await validate_user_id(session=session, user_id=link_input.user_id)
-    await validate_company_id(session=session, company_id=link_input.company_id)
-    return link_input
+    # Validate user_id
+    await validate_user_id(session=session, user_id=user_company_link_input.user_id)
+    # Validate company_id
+    await validate_company_id(
+        session=session, company_id=user_company_link_input.company_id
+    )
+
+    # Check if the user already has 3 company links
+    count: int = ...  # TODO: FIX ME
+    if count >= 3:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User '{user_company_link_input.user_id}' already has the maximum of 3 company links.",
+        )
+
+    return user_company_link_input
+
+
+async def validate_user_company_link(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    user_id: UUID4,
+    company_id: UUID4,
+) -> UserCompanyLink: ...  # FIX ME
+
+
+async def validate_get_user_company_links(
+    user_id: Optional[UUID4] = None,
+    company_id: Optional[UUID4] = None,
+) -> dict:
+    """
+    Validates that either user_id or company_id is provided, but not both.
+    Returns a dict with the provided parameter.
+    """
+    if user_id is None and company_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either user_id or company_id must be provided.",
+        )
+
+    if user_id is not None and company_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only one of user_id or company_id can be provided, not both.",
+        )
+
+    return {"user_id": user_id, "company_id": company_id}
 
 
 # endregion

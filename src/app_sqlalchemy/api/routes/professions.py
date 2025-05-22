@@ -13,9 +13,10 @@ from app_sqlalchemy.api.dependencies import (
 )
 from app_sqlalchemy.api.models import (
     ProfessionInput,
-    ProfessionResponseModel,
     ProfessionUpdate,
 )
+from app_sqlalchemy.api.models import Profession as ProfessionResponseModel
+
 from app_sqlalchemy.api.pagination import LimitOffsetPage
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,

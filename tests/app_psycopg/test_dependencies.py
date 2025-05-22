@@ -8,7 +8,7 @@ from psycopg import Connection, AsyncConnection
 from app_psycopg.api.dependencies import (
     validate_document_id,
     validate_user_id,
-    get_conn,
+    get_db_conn,
     get_db,
     validate_order_input,
     validate_profession_id,
@@ -84,7 +84,7 @@ async def test_get_conn():
     mock_request.state.conn_pool = mock_conn_pool
 
     # Act
-    conn_generator = get_conn(mock_request)
+    conn_generator = get_db_conn(mock_request)
     conn = await conn_generator.__anext__()
 
     # Assert

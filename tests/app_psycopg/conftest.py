@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
 
 from app_psycopg.api.app import app as psycopg_app
-from app_psycopg.api.dependencies import get_conn, get_db
+from app_psycopg.api.dependencies import get_db_conn, get_db
 from app_psycopg.db.db import Database
 
 
@@ -41,7 +41,7 @@ def client(app: FastAPI, mock_conn, mock_db) -> TestClient:
     def override_get_db(conn=Depends(override_get_conn)):
         return mock_db
 
-    app.dependency_overrides[get_conn] = override_get_conn
+    app.dependency_overrides[get_db_conn] = override_get_conn
     app.dependency_overrides[get_db] = override_get_db
 
     with TestClient(app) as test_client:

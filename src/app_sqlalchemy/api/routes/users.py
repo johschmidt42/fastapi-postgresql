@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app_sqlalchemy.api.dependencies import validate_user_id, get_db_session
-from app_sqlalchemy.api.models import UserResponseModel, UserInput, UserUpdate
+from app_sqlalchemy.api.models import UserInput, UserUpdate
+from app_sqlalchemy.api.models import User as UserResponseModel
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,

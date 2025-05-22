@@ -8,10 +8,10 @@ from sqlalchemy.future import select
 
 from app_sqlalchemy.api.dependencies import validate_document_id, get_db_session
 from app_sqlalchemy.api.models import (
-    DocumentResponseModel,
     DocumentInput,
     DocumentUpdate,
 )
+from app_sqlalchemy.api.models import Document as DocumentResponseModel
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
