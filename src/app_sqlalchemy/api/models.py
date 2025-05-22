@@ -7,11 +7,11 @@ from uuid import uuid4
 from pydantic import (
     BaseModel,
     computed_field,
-    ConfigDict,
+    field_serializer,
     StringConstraints,
     Field,
+    UUID4,
     model_validator,
-    field_serializer,
 )
 
 
@@ -56,8 +56,8 @@ class ProfessionInput(BaseModel):
     name: ProfessionName
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -72,24 +72,19 @@ class ProfessionUpdate(BaseModel):
         return datetime.now()
 
 
-class ProfessionResponseModel(BaseModel):
-    id: str
+class Profession(BaseModel):
+    id: UUID4
     name: ProfessionName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class ProfessionShortResponseModel(BaseModel):
-    id: str
+class ProfessionShort(BaseModel):
+    id: UUID4
     name: ProfessionName
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 # endregion
-
 
 # region User
 
@@ -103,11 +98,11 @@ UserName: Type = Annotated[
 
 class UserInput(BaseModel):
     name: UserName
-    profession_id: str
+    profession_id: UUID4
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -116,7 +111,7 @@ class UserInput(BaseModel):
 
 class UserUpdate(BaseModel):
     name: UserName
-    profession_id: str
+    profession_id: UUID4
 
     @computed_field
     def last_updated_at(self) -> datetime:
@@ -125,32 +120,27 @@ class UserUpdate(BaseModel):
 
 class UserPatch(BasePatch):
     name: Optional[UserName] = None
-    profession_id: Optional[str] = None
+    profession_id: Optional[UUID4] = None
 
     @computed_field
     def last_updated_at(self) -> datetime:
         return datetime.now()
 
 
-class UserResponseModel(BaseModel):
-    id: str
+class User(BaseModel):
+    id: UUID4
     name: UserName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
-    profession: ProfessionShortResponseModel
-
-    model_config = ConfigDict(from_attributes=True)
+    profession: ProfessionShort
 
 
-class UserShortResponseModel(BaseModel):
-    id: str
+class UserShort(BaseModel):
+    id: UUID4
     name: UserName
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 # endregion
-
 
 # region Order
 
@@ -159,12 +149,12 @@ OrderAmount: Type = Annotated[Decimal, Field(gt=0, le=1_000_000, decimal_places=
 
 class OrderInput(BaseModel):
     amount: OrderAmount
-    payer_id: str
-    payee_id: str
+    payer_id: UUID4
+    payee_id: UUID4
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -179,22 +169,19 @@ class OrderInput(BaseModel):
 
 class OrderInputValidated(BaseModel):
     order_input: OrderInput
-    payer: UserResponseModel
-    payee: UserResponseModel
+    payer: User
+    payee: User
 
 
-class OrderResponseModel(BaseModel):
-    id: str
+class Order(BaseModel):
+    id: UUID4
     amount: OrderAmount
-    payer: UserShortResponseModel
-    payee: UserShortResponseModel
+    payer: UserShort
+    payee: UserShort
     created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 # endregion
-
 
 # region Document
 
@@ -203,11 +190,11 @@ NonEmptyDict: Type = Annotated[dict, Field(min_length=1)]
 
 class DocumentInput(BaseModel):
     document: NonEmptyDict
-    user_id: str
+    user_id: UUID4
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -230,18 +217,15 @@ class DocumentUpdate(BaseModel):
         return json.dumps(document)
 
 
-class DocumentResponseModel(BaseModel):
-    id: str
+class Document(BaseModel):
+    id: UUID4
     document: NonEmptyDict
     created_at: datetime
     last_updated_at: Optional[datetime] = None
-    user_id: str
-
-    model_config = ConfigDict(from_attributes=True)
+    user_id: UUID4
 
 
 # endregion
-
 
 # region Company
 
@@ -255,8 +239,8 @@ class CompanyInput(BaseModel):
     name: CompanyName
 
     @computed_field
-    def id(self) -> str:
-        return uuid4().hex
+    def id(self) -> UUID4:
+        return uuid4()
 
     @computed_field
     def created_at(self) -> datetime:
@@ -279,66 +263,53 @@ class CompanyPatch(BasePatch):
         return datetime.now()
 
 
-class CompanyResponseModel(BaseModel):
-    id: str
+class Company(BaseModel):
+    id: UUID4
     name: CompanyName
     created_at: datetime
     last_updated_at: Optional[datetime] = None
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class CompanyShortResponseModel(BaseModel):
-    id: str
+class CompanyShort(BaseModel):
+    id: UUID4
     name: CompanyName
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 # endregion
-
 
 # region UserCompanyLink
 
 
 class UserCompanyLinkInput(BaseModel):
-    user_id: str
-    company_id: str
+    user_id: UUID4
+    company_id: UUID4
 
     @computed_field
     def created_at(self) -> datetime:
         return datetime.now()
 
 
-class UserCompanyLinkResponseModel(BaseModel):
-    user_id: str
-    company_id: str
+class UserCompanyLink(BaseModel):
+    user_id: UUID4
+    company_id: UUID4
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class UserCompanyLinkWithCompanyResponseModel(BaseModel):
-    user_id: str
-    company: CompanyShortResponseModel
+class UserCompanyLinkWithCompany(BaseModel):
+    user_id: UUID4
+    company: CompanyShort
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class UserCompanyLinkWithUserResponseModel(BaseModel):
-    company_id: str
-    user_info: UserShortResponseModel
+class UserCompanyLinkWithUser(BaseModel):
+    company_id: UUID4
+    user_info: UserShort
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class UserCompanyLinkCreatedResponseModel(BaseModel):
-    user_id: str
-    company_id: str
-
-    model_config = ConfigDict(from_attributes=True)
+class UserCompanyLinkResponse(BaseModel):
+    user_id: UUID4
+    company_id: UUID4
 
 
 # endregion
