@@ -29,12 +29,12 @@ from app_psycopg.api.models import (
 from app_psycopg.db.db import Database
 
 
-async def get_conn(request: Request) -> AsyncGenerator[Connection, None]:
+async def get_db_conn(request: Request) -> AsyncGenerator[Connection, None]:
     async with request.state.conn_pool.connection() as connection:
         yield connection
 
 
-async def get_db(conn: Annotated[AsyncConnection, Depends(get_conn)]) -> Database:
+async def get_db(conn: Annotated[AsyncConnection, Depends(get_db_conn)]) -> Database:
     return Database(conn)
 
 
