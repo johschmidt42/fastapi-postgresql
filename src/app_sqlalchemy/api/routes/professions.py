@@ -43,13 +43,12 @@ async def create_profession(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     profession_input: Annotated[ProfessionInput, Depends(validate_profession_input)],
 ) -> str:
-    profession = Profession(
+    profession: Profession = Profession(
         id=profession_input.id,
         name=profession_input.name,
         created_at=profession_input.created_at,
     )
     session.add(profession)
-    await session.flush()
     return profession.id
 
 
@@ -104,13 +103,11 @@ async def get_professions(
 
 @router.put(path="/{profession_id}", response_model=str, status_code=status.HTTP_200_OK)
 async def update_profession(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
     profession: Annotated[Profession, Depends(validate_profession_id)],
     profession_update: Annotated[ProfessionUpdate, Depends(validate_profession_update)],
 ) -> str:
     profession.name = profession_update.name
     profession.last_updated_at = profession_update.last_updated_at
-    await session.flush()
     return profession.id
 
 
