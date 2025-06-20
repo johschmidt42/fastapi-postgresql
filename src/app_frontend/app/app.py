@@ -42,9 +42,7 @@ class State(rx.State):
 
 def index():
     return rx.vstack(
-        rx.button(
-            "Toggle", on_click=State.fetch_users
-        ),
+        rx.button("Toggle", on_click=State.fetch_users),
         rx.cond(
             State.success,
             rx.vstack(
