@@ -57,7 +57,7 @@ async def get_user(
 @router.get(
     path="",
     response_model=LimitOffsetPage[UserResponseModel],
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
 )
 async def get_users(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
@@ -72,7 +72,9 @@ async def get_users(
             query=query, order_by_fields=order_by, model=User
         )
 
-    result: Result = await db_session.execute(create_paginate_query(query=query, limit=limit, offset=offset))
+    result: Result = await db_session.execute(
+        create_paginate_query(query=query, limit=limit, offset=offset)
+    )
     users: Sequence[Any] = result.scalars().all()
 
     count_query: Select = select(func.count()).select_from(query.subquery())
@@ -86,7 +88,6 @@ async def get_users(
         limit=limit,
         offset=offset,
     )
-
 
 
 @router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)

@@ -130,17 +130,21 @@ class Order(Base):
     id: Mapped[uuid_pk]
     amount: Mapped[Decimal] = mapped_column(Numeric(9, 2), nullable=False)
     # Define the mapped columns for payer_id and payee_id directly
-    payer_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    payee_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    payer_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    payee_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
     created_at: Mapped[created_at_type]
 
     payer: Mapped["User"] = relationship(
-        foreign_keys=[payer_id], # Pass the column object here
-        back_populates="orders_placed"
+        foreign_keys=[payer_id],  # Pass the column object here
+        back_populates="orders_placed",
     )
     payee: Mapped["User"] = relationship(
-        foreign_keys=[payee_id], # Pass the column object here
-        back_populates="orders_received"
+        foreign_keys=[payee_id],  # Pass the column object here
+        back_populates="orders_received",
     )
 
     def __repr__(self) -> str:
@@ -156,7 +160,9 @@ class Document(Base):
     )  # JSONB can store dicts/lists
     created_at: Mapped[created_at_type]
     last_updated_at: Mapped[updated_at_type]
-    user_id: Mapped[user_fk_nn] # This uses the Annotated type, which is fine as it wraps mapped_column
+    user_id: Mapped[
+        user_fk_nn
+    ]  # This uses the Annotated type, which is fine as it wraps mapped_column
 
     user: Mapped["User"] = relationship(back_populates="documents")
 

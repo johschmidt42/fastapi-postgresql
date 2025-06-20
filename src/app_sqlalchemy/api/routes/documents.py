@@ -1,12 +1,17 @@
 from typing import Annotated, List, Any, Type, Optional, Set
 
-from fastapi import APIRouter, Body, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator
 from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app_sqlalchemy.api.dependencies import validate_document_id, get_db_session
+from app_sqlalchemy.api.dependencies import (
+    validate_document_id,
+    get_db_session,
+    validate_document_input,
+    validate_document_update,
+)
 from app_sqlalchemy.api.models import (
     DocumentInput,
     DocumentUpdate,
@@ -34,7 +39,7 @@ OrderByDocument: Type = Annotated[
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
 async def create_document(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    document_input: Annotated[DocumentInput, Body(...)],
+    document_input: Annotated[DocumentInput, Depends(validate_document_input)],
 ) -> str:
     new_document: Document = Document(
         id=document_input.id,
@@ -63,8 +68,8 @@ async def get_document(
 )
 async def get_documents(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
+    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
     order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> List[DocumentResponseModel]:
     query: Select = select(Document).limit(limit).offset(offset)
@@ -84,7 +89,7 @@ async def get_documents(
 @router.put(path="/{document_id}", response_model=str, status_code=status.HTTP_200_OK)
 async def update_document(
     document: Annotated[Document, Depends(validate_document_id)],
-    update: Annotated[DocumentUpdate, Body(...)],
+    update: Annotated[DocumentUpdate, Depends(validate_document_update)],
 ) -> str:
     document.document = update.document
     document.last_updated_at = update.last_updated_at

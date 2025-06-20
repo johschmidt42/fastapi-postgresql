@@ -20,7 +20,8 @@ from app_sqlalchemy.api.models import Profession as ProfessionResponseModel
 from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
-    validate_order_by_query_params, create_order_by_query,
+    validate_order_by_query_params,
+    create_order_by_query,
 )
 from app_sqlalchemy.db.db_models import Profession
 
@@ -74,7 +75,9 @@ async def get_professions(
     offset: Annotated[int, Query(ge=0, le=1000)] = 0,
     order_by: Annotated[OrderByProfession, Query()] = None,
 ) -> LimitOffsetPage[ProfessionResponseModel]:
-    query: Select = create_paginate_query(query=select(Profession), limit=limit, offset=offset)
+    query: Select = create_paginate_query(
+        query=select(Profession), limit=limit, offset=offset
+    )
 
     if order_by:
         query: Select = create_order_by_query(
@@ -83,7 +86,7 @@ async def get_professions(
 
     result: Result = await db_session.execute(query)
 
-    professions: Sequence[Row | RowMapping | Any]  = result.scalars().all()
+    professions: Sequence[Row | RowMapping | Any] = result.scalars().all()
 
     # Get total count
     count_query = select(func.count()).select_from(Profession)
