@@ -2,6 +2,7 @@ from typing import AsyncGenerator, Annotated, Optional
 
 from fastapi import Request, Depends, HTTPException, Body
 from pydantic import UUID4
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from starlette import status
 
@@ -21,7 +22,14 @@ from app_sqlalchemy.api.models import (
     UserCompanyLinkInput,
     UserCompanyLink,
 )
-from app_sqlalchemy.db.db_models import User, Document, Profession, Company, Order
+from app_sqlalchemy.db.db_models import (
+    User,
+    Document,
+    Profession,
+    Company,
+    Order,
+    users_companies_table,
+)
 
 
 async def get_db_connection(request: Request) -> AsyncGenerator[AsyncConnection, None]:
@@ -40,7 +48,7 @@ async def get_db_session(request: Request) -> AsyncGenerator[AsyncSession, None]
 
 async def validate_profession_id(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    profession_id: str,
+    profession_id: UUID4,
 ) -> Profession:
     profession: Profession | None = await session.get(Profession, profession_id)
     if profession is None:
@@ -70,7 +78,7 @@ async def validate_profession_update(
 
 
 async def validate_user_id(
-    session: Annotated[AsyncSession, Depends(get_db_session)], user_id: str
+    session: Annotated[AsyncSession, Depends(get_db_session)], user_id: UUID4
 ) -> User:
     user: User | None = await session.get(User, user_id)
     if user is None:
@@ -119,7 +127,7 @@ async def validate_user_patch(
 
 
 async def validate_document_id(
-    session: Annotated[AsyncSession, Depends(get_db_session)], document_id: str
+    session: Annotated[AsyncSession, Depends(get_db_session)], document_id: UUID4
 ) -> Document:
     document: Document | None = await session.get(Document, document_id)
     if document is None:
@@ -154,7 +162,7 @@ async def validate_document_update(
 
 async def validate_order_id(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    order_id: str,
+    order_id: UUID4,
 ) -> Order:
     order: Order | None = await session.get(Order, order_id)
     if order is None:
@@ -185,7 +193,7 @@ async def validate_order_input(
 
 async def validate_company_id(
     session: Annotated[AsyncSession, Depends(get_db_session)],
-    company_id: str,
+    company_id: UUID4,
 ) -> Company:
     company: Company | None = await session.get(Company, company_id)
     if company is None:
@@ -232,7 +240,14 @@ async def validate_user_company_link_input(
     )
 
     # Check if the user already has 3 company links
-    count: int = ...  # TODO: FIX ME
+    query = (
+        select(func.count())
+        .select_from(users_companies_table)
+        .where(users_companies_table.c.user_id == user_company_link_input.user_id)
+    )
+    result = await session.execute(query)
+    count: int = result.scalar()
+
     if count >= 3:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -246,7 +261,26 @@ async def validate_user_company_link(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     user_id: UUID4,
     company_id: UUID4,
-) -> UserCompanyLink: ...  # FIX ME
+) -> UserCompanyLink:
+    query = select(users_companies_table).where(
+        users_companies_table.c.user_id == user_id,
+        users_companies_table.c.company_id == company_id,
+    )
+    result = await session.execute(query)
+    user_company_link = result.first()
+
+    if user_company_link is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User-Company-Link '{user_id}/{company_id}' not found!",
+        )
+
+    # Convert the row to a UserCompanyLink model
+    return UserCompanyLink(
+        user_id=user_company_link.user_id,
+        company_id=user_company_link.company_id,
+        created_at=user_company_link.created_at,
+    )
 
 
 async def validate_get_user_company_links(
