@@ -11,7 +11,7 @@ This repository demonstrates how to integrate 2 popular **async PostgreSQL libra
 
 - **Database Transaction Handling**: Automatic commits & rollbacks using FastAPI's dependency injection system & context
   managers.
-- **Validations**: Input validation with Pydantic's validators and Depends() functions.
+- **Validations**: Input validation with Pydantic's validators and `Depends()` functions.
 - **Pagination**: Basic limit offset pagination.
 - **Sorting**: Basic multi-column sorting via query parameters: `?order_by=+[attr]` for ascending order and
   `?order_by=-[attr]`
@@ -32,6 +32,7 @@ make start-db
 ![schema.png](docs/schema.png)
 
 **Summary**:
+
 - TODO:
 
 Users Table (users): Stores individual user details.
@@ -41,6 +42,8 @@ Users_Companies Table (users_companies): A junction table that links users to co
 - A single user has a single profession (1:1)
 - A single user can have multiple documents (1:N)
 - A single user can be assigned to multiple companies but a maximum of 3 (N:N)
+
+Lookup tables are preferred over enums, because they allow to add additional metadata.
 
 ### FastAPI with psycopg
 
@@ -70,3 +73,4 @@ Go to [app_sqlalchemy](src/app_sqlalchemy)
 
 - [ ] Add filters
 - [ ] Indexes
+- [ ] Image for every user

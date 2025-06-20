@@ -11,6 +11,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     conn_info: str = "postgresql+psycopg://admin:admin@localhost:5432/postgres"
     async with (
         DatabaseEngine(
+            echo=True,
             host=conn_info,
             pool_size=2,
             max_overflow=0,

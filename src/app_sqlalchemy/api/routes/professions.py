@@ -1,8 +1,8 @@
-from typing import Annotated, List, Type, Optional, Set
+from typing import Annotated, List, Type, Optional, Set, Sequence, Any
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator
-from sqlalchemy import select, func
+from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app_sqlalchemy.api.dependencies import (
@@ -17,10 +17,10 @@ from app_sqlalchemy.api.models import (
 )
 from app_sqlalchemy.api.models import Profession as ProfessionResponseModel
 
-from app_sqlalchemy.api.pagination import LimitOffsetPage
+from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
-    validate_order_by_query_params,
+    validate_order_by_query_params, create_order_by_query,
 )
 from app_sqlalchemy.db.db_models import Profession
 
@@ -69,32 +69,25 @@ async def get_profession(
     status_code=status.HTTP_200_OK,
 )
 async def get_professions(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    db_session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
     offset: Annotated[int, Query(ge=0, le=1000)] = 0,
     order_by: Annotated[OrderByProfession, Query()] = None,
 ) -> LimitOffsetPage[ProfessionResponseModel]:
-    # Build query for professions
-    query = select(Profession)
+    query: Select = create_paginate_query(query=select(Profession), limit=limit, offset=offset)
 
-    # Apply sorting if provided
     if order_by:
-        for field_name, direction in order_by:
-            if direction == "asc":
-                query = query.order_by(getattr(Profession, field_name).asc())
-            else:
-                query = query.order_by(getattr(Profession, field_name).desc())
+        query: Select = create_order_by_query(
+            query=query, order_by_fields=order_by, model=Profession
+        )
 
-    # Apply pagination
-    query = query.limit(limit).offset(offset)
+    result: Result = await db_session.execute(query)
 
-    # Execute query
-    result = await session.execute(query)
-    professions = result.scalars().all()
+    professions: Sequence[Row | RowMapping | Any]  = result.scalars().all()
 
     # Get total count
     count_query = select(func.count()).select_from(Profession)
-    result = await session.execute(count_query)
+    result = await db_session.execute(count_query)
     total = result.scalar()
 
     return LimitOffsetPage(

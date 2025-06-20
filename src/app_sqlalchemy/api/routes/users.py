@@ -2,13 +2,14 @@ from typing import Annotated, List, Any, Type, Optional, Set
 
 from fastapi import APIRouter, Body, Depends, status, Query
 from pydantic import AfterValidator
-from sqlalchemy import Select, Result, Sequence, Row, RowMapping
+from sqlalchemy import Select, Result, Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app_sqlalchemy.api.dependencies import validate_user_id, get_db_session
-from app_sqlalchemy.api.models import UserInput, UserUpdate
 from app_sqlalchemy.api.models import User as UserResponseModel
+from app_sqlalchemy.api.models import UserInput, UserUpdate
+from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
 from app_sqlalchemy.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
@@ -54,26 +55,38 @@ async def get_user(
 
 
 @router.get(
-    path="", response_model=List[UserResponseModel], status_code=status.HTTP_200_OK
+    path="",
+    response_model=LimitOffsetPage[UserResponseModel],
+    status_code=status.HTTP_200_OK
 )
 async def get_users(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: Annotated[int, Query(ge=1)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
     order_by: Annotated[OrderByUser, Query()] = None,
-) -> List[UserResponseModel]:
-    query: Select = select(User).limit(limit).offset(offset)
+) -> LimitOffsetPage[UserResponseModel]:
+    query: Select = select(User)
 
     if order_by:
         query: Select = create_order_by_query(
             query=query, order_by_fields=order_by, model=User
         )
 
-    result: Result = await db_session.execute(query)
+    result: Result = await db_session.execute(create_paginate_query(query=query, limit=limit, offset=offset))
+    users: Sequence[Any] = result.scalars().all()
 
-    users: Sequence[Row | RowMapping | Any] = result.scalars().all()
+    count_query: Select = select(func.count()).select_from(query.subquery())
+    total_count_result: Result = await db_session.execute(count_query)
+    total_count: int = total_count_result.scalar_one()
 
-    return [UserResponseModel.model_validate(user) for user in users]
+    return LimitOffsetPage(
+        items=[UserResponseModel.model_validate(user) for user in users],
+        items_count=len(users),
+        total_count=total_count,
+        limit=limit,
+        offset=offset,
+    )
+
 
 
 @router.put(path="/{user_id}", response_model=str, status_code=status.HTTP_200_OK)
