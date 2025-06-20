@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Annotated, Dict
 
@@ -21,15 +21,15 @@ required_str_20 = Annotated[str, mapped_column(String(20), nullable=False)]
 created_at_type = Annotated[
     datetime,
     mapped_column(
-        TIMESTAMP(timezone=True),
+        TIMESTAMP(timezone=False),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(),
     ),
 ]
 updated_at_type = Annotated[
     Optional[datetime],
     mapped_column(
-        TIMESTAMP(timezone=True), onupdate=lambda: datetime.now(timezone.utc)
+        TIMESTAMP(timezone=False), onupdate=lambda: datetime.now()
     ),
 ]
 user_fk_nn = Annotated[
@@ -54,12 +54,11 @@ users_companies_table = Table(
         ForeignKey("companies.id", ondelete="CASCADE"),
         primary_key=True,
     ),
-    # Updated to use datetime.now(timezone.utc)
     Column(
         "created_at",
-        TIMESTAMP(timezone=True),
+        TIMESTAMP(timezone=False),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(),
     ),
 )
 
