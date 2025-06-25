@@ -62,7 +62,7 @@ async def get_companies(
     db: Annotated[Database, Depends(get_db)],
     limit: Annotated[int, Query(ge=1, lt=50)] = 10,
     offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
-    order_by: Annotated[OrderByCompany | None, Query()] = None,
+    order_by: Annotated[OrderByCompany, Query()] = None,
 ) -> LimitOffsetPage[Company]:
     companies: List[Company] = await db.get_companies(
         limit=limit, offset=offset, order_by=order_by
