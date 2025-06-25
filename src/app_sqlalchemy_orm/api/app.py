@@ -2,12 +2,12 @@ import os
 
 from fastapi import FastAPI
 
-from app_sqlalchemy.api.lifespan import lifespan
-from app_sqlalchemy.api.routes import users, professions, companies
-from app_sqlalchemy.api.routes import orders
-from app_sqlalchemy.api.routes import documents
+from app_sqlalchemy_orm.api.lifespan import lifespan
+from app_sqlalchemy_orm.api.routes import users, professions, companies
+from app_sqlalchemy_orm.api.routes import orders
+from app_sqlalchemy_orm.api.routes import documents
 
-from app_sqlalchemy.api.routes import user_company_links
+from app_sqlalchemy_orm.api.routes import user_company_links
 
 app: FastAPI = FastAPI(lifespan=lifespan)
 app.include_router(router=users.router)

@@ -55,7 +55,7 @@ Go to [app_psycopg](src/app_psycopg)
 
 ### FastAPI with SQLAlchemy (async)
 
-Go to [app_sqlalchemy](src/app_sqlalchemy)
+Go to [app_sqlalchemy](src/app_sqlalchemy_orm)
 
 **Resources**:
 

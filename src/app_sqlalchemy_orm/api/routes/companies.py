@@ -5,27 +5,27 @@ from pydantic import AfterValidator, UUID4
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy.api.dependencies import (
+from app_sqlalchemy_orm.api.dependencies import (
     get_db_session,
     validate_company_id,
     validate_company_input,
     validate_company_update,
     validate_company_patch,
 )
-from app_sqlalchemy.api.models import (
+from app_sqlalchemy_orm.api.models import (
     CompanyInput,
     CompanyUpdate,
     CompanyPatch,
 )
-from app_sqlalchemy.api.models import Company as CompanyResponseModel
+from app_sqlalchemy_orm.api.models import Company as CompanyResponseModel
 
-from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
-from app_sqlalchemy.api.sorting import (
+from app_sqlalchemy_orm.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy.db.db_models import Company
+from app_sqlalchemy_orm.db.db_models import Company
 
 
 router: APIRouter = APIRouter(

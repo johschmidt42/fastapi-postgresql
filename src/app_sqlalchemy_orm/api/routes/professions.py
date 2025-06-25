@@ -5,25 +5,25 @@ from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy.api.dependencies import (
+from app_sqlalchemy_orm.api.dependencies import (
     get_db_session,
     validate_profession_id,
     validate_profession_input,
     validate_profession_update,
 )
-from app_sqlalchemy.api.models import (
+from app_sqlalchemy_orm.api.models import (
     ProfessionInput,
     ProfessionUpdate,
 )
-from app_sqlalchemy.api.models import Profession as ProfessionResponseModel
+from app_sqlalchemy_orm.api.models import Profession as ProfessionResponseModel
 
-from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
-from app_sqlalchemy.api.sorting import (
+from app_sqlalchemy_orm.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy.db.db_models import Profession
+from app_sqlalchemy_orm.db.db_models import Profession
 
 
 router: APIRouter = APIRouter(

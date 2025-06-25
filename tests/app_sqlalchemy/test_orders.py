@@ -4,8 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette import status
 
-from app_sqlalchemy.api.dependencies import ValidatedOrder
-from app_sqlalchemy.api.models import OrderInput
+from app_sqlalchemy_orm.api.dependencies import ValidatedOrder
+from app_sqlalchemy_orm.api.models import OrderInput
 from conftest import UserResponseFactory, OrderResponseFactory, UserFactory
 
 

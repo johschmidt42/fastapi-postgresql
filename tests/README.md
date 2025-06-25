@@ -34,5 +34,5 @@ pytest app_psycopg
 
 ```bash
 # Run tests for a the sqlalchemy app
-pytest app_sqlalchemy
+pytest app_sqlalchemy_orm
 ```

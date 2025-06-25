@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 
-from app_sqlalchemy.api.dependencies import (
+from app_sqlalchemy_orm.api.dependencies import (
     get_db_connection,
     get_db_session,
     validate_user_id,
@@ -11,8 +11,8 @@ from app_sqlalchemy.api.dependencies import (
     validate_document_id,
     ValidatedOrder,
 )
-from app_sqlalchemy.api.models import OrderInput
-from app_sqlalchemy.db.db_models import User, Document
+from app_sqlalchemy_orm.api.models import OrderInput
+from app_sqlalchemy_orm.db.db_models import User, Document
 from tests.app_sqlalchemy.conftest import UserFactory, DocumentFactory
 
 
@@ -158,7 +158,7 @@ async def test_validate_order_input_success():
     order_input = OrderInput(amount=100.0, payer_id=payer_id, payee_id=payee_id)
 
     # Mock validate_user_id to return the users
-    with patch("app_sqlalchemy.api.dependencies.validate_user_id") as mock_validate:
+    with patch("app_sqlalchemy_orm.api.dependencies.validate_user_id") as mock_validate:
         mock_validate.side_effect = [payer, payee]
 
         # Act
@@ -184,7 +184,7 @@ async def test_validate_order_input_payer_not_found():
     order_input = OrderInput(amount=100.0, payer_id=payer_id, payee_id=payee_id)
 
     # Mock validate_user_id to raise an exception for payer
-    with patch("app_sqlalchemy.api.dependencies.validate_user_id") as mock_validate:
+    with patch("app_sqlalchemy_orm.api.dependencies.validate_user_id") as mock_validate:
         mock_validate.side_effect = HTTPException(
             status_code=404, detail=f"User '{payer_id}' not found!"
         )
@@ -209,7 +209,7 @@ async def test_validate_order_input_payee_not_found():
     order_input = OrderInput(amount=100.0, payer_id=payer_id, payee_id=payee_id)
 
     # Mock validate_user_id to return payer but raise an exception for payee
-    with patch("app_sqlalchemy.api.dependencies.validate_user_id") as mock_validate:
+    with patch("app_sqlalchemy_orm.api.dependencies.validate_user_id") as mock_validate:
         mock_validate.side_effect = [
             payer,
             HTTPException(status_code=404, detail=f"User '{payee_id}' not found!"),

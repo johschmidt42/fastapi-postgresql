@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import String, TIMESTAMP, Numeric
 
-from app_sqlalchemy.db import Base
+from app_sqlalchemy_orm.db import Base
 
 uuid_pk = Annotated[
     uuid.UUID,

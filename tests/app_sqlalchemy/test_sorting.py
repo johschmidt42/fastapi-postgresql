@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import Select, Column, Integer, String
 from sqlalchemy.orm import declarative_base
-from app_sqlalchemy.api.sorting import (
+from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     _parse_str_order_by,
     parse_order_by,

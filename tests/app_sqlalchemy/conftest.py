@@ -9,21 +9,21 @@ from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory.factories.sqlalchemy_factory import SQLAlchemyFactory
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy.api.app import app as sqlalchemy_app
-from app_sqlalchemy.api.dependencies import (
+from app_sqlalchemy_orm.api.app import app as sqlalchemy_app
+from app_sqlalchemy_orm.api.dependencies import (
     get_db_session,
     validate_user_id,
     validate_order_input,
     validate_document_id,
     ValidatedOrder,
 )
-from app_sqlalchemy.api.models import (
+from app_sqlalchemy_orm.api.models import (
     UserResponseModel,
     OrderResponseModel,
     OrderInput,
     DocumentResponseModel,
 )
-from app_sqlalchemy.db.db_models import User, Document
+from app_sqlalchemy_orm.db.db_models import User, Document
 
 
 class UserResponseFactory(ModelFactory[UserResponseModel]):

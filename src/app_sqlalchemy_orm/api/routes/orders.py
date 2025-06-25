@@ -5,20 +5,20 @@ from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy.api.dependencies import (
+from app_sqlalchemy_orm.api.dependencies import (
     get_db_session,
     validate_order_input,
     validate_order_id,
 )
-from app_sqlalchemy.api.models import OrderInputValidated
-from app_sqlalchemy.api.models import Order as OrderResponseModel
-from app_sqlalchemy.api.pagination import LimitOffsetPage, create_paginate_query
-from app_sqlalchemy.api.sorting import (
+from app_sqlalchemy_orm.api.models import OrderInputValidated
+from app_sqlalchemy_orm.api.models import Order as OrderResponseModel
+from app_sqlalchemy_orm.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy.db.db_models import Order
+from app_sqlalchemy_orm.db.db_models import Order
 
 router: APIRouter = APIRouter(
     tags=["Orders"],
