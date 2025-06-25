@@ -28,9 +28,7 @@ created_at_type = Annotated[
 ]
 updated_at_type = Annotated[
     Optional[datetime],
-    mapped_column(
-        TIMESTAMP(timezone=False), onupdate=lambda: datetime.now()
-    ),
+    mapped_column(TIMESTAMP(timezone=False), onupdate=lambda: datetime.now()),
 ]
 user_fk_nn = Annotated[
     uuid.UUID,

@@ -74,7 +74,7 @@ async def get_companies(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
     offset: Annotated[int, Query(ge=0, le=1000)] = 0,
-    order_by: Annotated[OrderByCompany, Query()] = None,
+    order_by: Annotated[OrderByCompany | None, Query()] = None,
 ) -> LimitOffsetPage[CompanyResponseModel]:
     query: Select = create_paginate_query(
         query=select(Company), limit=limit, offset=offset
