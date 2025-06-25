@@ -125,7 +125,68 @@ VALUES (
         SELECT id FROM professions
         ORDER BY random() LIMIT 1
     )
+),
+(
+    gen_random_uuid(), 'Uma', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Valentina', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Wesley', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Xander', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Yara', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Zane', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Vera', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Wyatt', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Ximena', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
+),
+(
+    gen_random_uuid(), 'Yusuf', now(), NULL, (
+        SELECT id FROM professions
+        ORDER BY random() LIMIT 1
+    )
 );
+
 
 -- Insert orders
 INSERT INTO orders (id, amount, payer_id, payee_id, created_at)
