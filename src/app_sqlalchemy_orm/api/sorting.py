@@ -98,12 +98,18 @@ def create_order_by_query(
     if not order_by_fields:
         return query
 
+    # grab the ColumnCollection
+    # ORM class:   model.__table__ -> Table -> .c
+    # Core Table:  model           -> .c
+    tbl = getattr(model, "__table__", model)
+    cols = getattr(tbl, "c", tbl)
+
     order_clauses = []
     for field in order_by_fields:
-        column = getattr(model, field.name)
-        if field.direction == Direction.ASC:
-            order_clauses.append(nulls_last(asc(column)))
+        col = getattr(cols, field.name)
+        if field.direction is Direction.ASC:
+            order_clauses.append(nulls_last(asc(col)))
         else:
-            order_clauses.append(nulls_last(desc(column)))
+            order_clauses.append(nulls_last(desc(col)))
 
     return query.order_by(*order_clauses)

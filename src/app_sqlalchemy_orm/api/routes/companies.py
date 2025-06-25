@@ -74,7 +74,7 @@ async def get_companies(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
     offset: Annotated[int, Query(ge=0, le=1000)] = 0,
-    order_by: Annotated[OrderByCompany | None, Query()] = None,
+    order_by: Annotated[OrderByCompany, Query()] = None,
 ) -> LimitOffsetPage[CompanyResponseModel]:
     query: Select = create_paginate_query(
         query=select(Company), limit=limit, offset=offset
@@ -90,9 +90,9 @@ async def get_companies(
     companies: Sequence[Row | RowMapping | Any] = result.scalars().all()
 
     # Get total count
-    count_query = select(func.count()).select_from(Company)
-    result = await db_session.execute(count_query)
-    total = result.scalar()
+    count_query: Select = select(func.count()).select_from(Company)
+    result: Result = await db_session.execute(count_query)
+    total: int = result.scalar()
 
     return LimitOffsetPage(
         items=companies,
