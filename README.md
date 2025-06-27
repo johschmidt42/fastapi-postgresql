@@ -73,4 +73,5 @@ Go to [app_sqlalchemy](src/app_sqlalchemy_orm)
 
 - [ ] Add filters
 - [ ] Indexes
-- [ ] Image for every user
+- [ ] Image for every user (but store on postgresql)
+- [ ] Search functionality
