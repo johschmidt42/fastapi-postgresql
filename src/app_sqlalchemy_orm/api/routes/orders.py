@@ -12,7 +12,11 @@ from app_sqlalchemy_orm.api.dependencies import (
 )
 from app_sqlalchemy_orm.api.models import OrderInputValidated
 from app_sqlalchemy_orm.api.models import Order as OrderResponseModel
-from app_sqlalchemy_orm.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_orm.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
 from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
@@ -73,12 +77,11 @@ async def get_order(
 )
 async def get_orders(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByOrder, Query()] = None,
 ) -> LimitOffsetPage[OrderResponseModel]:
     query: Select = create_paginate_query(
-        query=select(Order), limit=limit, offset=offset
+        query=select(Order), limit=pagination.limit, offset=pagination.offset
     )
 
     if order_by:
@@ -99,8 +102,8 @@ async def get_orders(
         items=orders,
         items_count=len(orders),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 

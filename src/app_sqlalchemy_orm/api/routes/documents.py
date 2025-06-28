@@ -17,6 +17,7 @@ from app_sqlalchemy_orm.api.models import (
     DocumentUpdate,
 )
 from app_sqlalchemy_orm.api.models import Document as DocumentResponseModel
+from app_sqlalchemy_orm.api.pagination import PaginationParams
 from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
@@ -68,11 +69,10 @@ async def get_document(
 )
 async def get_documents(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
-    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> List[DocumentResponseModel]:
-    query: Select = select(Document).limit(limit).offset(offset)
+    query: Select = select(Document).limit(pagination.limit).offset(pagination.offset)
 
     if order_by:
         query: Select = create_order_by_query(

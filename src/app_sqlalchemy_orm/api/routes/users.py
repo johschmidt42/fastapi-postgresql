@@ -9,7 +9,11 @@ from sqlalchemy.future import select
 from app_sqlalchemy_orm.api.dependencies import validate_user_id, get_db_session
 from app_sqlalchemy_orm.api.models import User as UserResponseModel
 from app_sqlalchemy_orm.api.models import UserInput, UserUpdate
-from app_sqlalchemy_orm.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_orm.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
 from app_sqlalchemy_orm.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
@@ -61,8 +65,7 @@ async def get_user(
 )
 async def get_users(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: Annotated[int, Query(ge=1)] = 10,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByUser, Query()] = None,
 ) -> LimitOffsetPage[UserResponseModel]:
     query: Select = select(User)
@@ -73,7 +76,9 @@ async def get_users(
         )
 
     result: Result = await db_session.execute(
-        create_paginate_query(query=query, limit=limit, offset=offset)
+        create_paginate_query(
+            query=query, limit=pagination.limit, offset=pagination.offset
+        )
     )
     users: Sequence[Any] = result.scalars().all()
 
@@ -85,8 +90,8 @@ async def get_users(
         items=[UserResponseModel.model_validate(user) for user in users],
         items_count=len(users),
         total_count=total_count,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 
