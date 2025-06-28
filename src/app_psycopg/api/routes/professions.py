@@ -14,7 +14,7 @@ from app_psycopg.api.models import (
     Profession,
     ProfessionUpdate,
 )
-from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 
@@ -58,12 +58,11 @@ async def get_profession(
 )
 async def get_professions(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByProfession, Query()] = None,
 ) -> LimitOffsetPage[Profession]:
     professions: List[Profession] = await db.get_professions(
-        limit=limit, offset=offset, order_by=order_by
+        limit=pagination.limit, offset=pagination.offset, order_by=order_by
     )
     total: int = await db.get_professions_count()
 
@@ -71,8 +70,8 @@ async def get_professions(
         items=professions,
         items_count=len(professions),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 

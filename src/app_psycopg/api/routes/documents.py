@@ -14,7 +14,7 @@ from app_psycopg.api.models import (
     Document,
     DocumentUpdate,
 )
-from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 
@@ -58,12 +58,11 @@ async def get_document(
 )
 async def get_documents(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
-    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByDocument, Query()] = None,
 ) -> LimitOffsetPage[Document]:
     documents: List[Document] = await db.get_documents(
-        limit=limit, offset=offset, order_by=order_by
+        limit=pagination.limit, offset=pagination.offset, order_by=order_by
     )
     total: int = await db.get_documents_count()
 
@@ -75,8 +74,8 @@ async def get_documents(
         items=items,
         items_count=len(items),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 

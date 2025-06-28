@@ -5,7 +5,7 @@ from pydantic import AfterValidator, UUID4
 
 from app_psycopg.api.dependencies import get_db, validate_order_input, validate_order_id
 from app_psycopg.api.models import Order, OrderInputValidated
-from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 
@@ -51,12 +51,11 @@ async def get_order(
 )
 async def get_orders(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1, lt=50)] = 10,
-    offset: Annotated[int, Query(ge=0, lt=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByOrder, Query()] = None,
 ) -> LimitOffsetPage[Order]:
     orders: List[Order] = await db.get_orders(
-        limit=limit, offset=offset, order_by=order_by
+        limit=pagination.limit, offset=pagination.offset, order_by=order_by
     )
     total: int = await db.get_orders_count()
 
@@ -64,8 +63,8 @@ async def get_orders(
         items=orders,
         items_count=len(orders),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 

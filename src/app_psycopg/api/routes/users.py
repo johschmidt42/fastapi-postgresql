@@ -16,7 +16,7 @@ from app_psycopg.api.models import (
     User,
     UserPatch,
 )
-from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 
@@ -60,12 +60,11 @@ async def get_user(
 )
 async def get_users(
     db: Annotated[Database, Depends(get_db)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByUser, Query()] = None,
 ) -> LimitOffsetPage[User]:
     users: List[User] = await db.get_users(
-        limit=limit, offset=offset, order_by=order_by
+        limit=pagination.limit, offset=pagination.offset, order_by=order_by
     )
     total: int = await db.get_users_count()
 
@@ -73,8 +72,8 @@ async def get_users(
         items=users,
         items_count=len(users),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 

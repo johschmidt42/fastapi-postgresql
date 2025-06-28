@@ -1,6 +1,6 @@
 from typing import Annotated, Tuple, List
 
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 
 from app_psycopg.api.dependencies import (
@@ -17,7 +17,7 @@ from app_psycopg.api.models import (
     UserCompanyLinkWithUser,
     UserCompanyLinkResponse,
 )
-from app_psycopg.api.pagination import LimitOffsetPage
+from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.db.db import Database
 
 router: APIRouter = APIRouter(
@@ -67,8 +67,7 @@ async def delete_user_company_link(
 async def get_user_company_links(
     db: Annotated[Database, Depends(get_db)],
     params: Annotated[dict, Depends(validate_get_user_company_links)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
 ) -> (
     LimitOffsetPage[UserCompanyLinkWithCompany]
     | LimitOffsetPage[UserCompanyLinkWithUser]
@@ -84,7 +83,7 @@ async def get_user_company_links(
         links: List[
             UserCompanyLinkWithCompany
         ] = await db.get_user_company_links_by_user(
-            user_id=params["user_id"], limit=limit, offset=offset
+            user_id=params["user_id"], limit=pagination.limit, offset=pagination.offset
         )
         total: int = await db.get_user_company_links_count_by_user(
             user_id=params["user_id"]
@@ -94,8 +93,8 @@ async def get_user_company_links(
             items=links,
             items_count=len(links),
             total_count=total,
-            limit=limit,
-            offset=offset,
+            limit=pagination.limit,
+            offset=pagination.offset,
         )
     # Else company_id is provided (guaranteed by validate_get_user_company_links)
     else:
@@ -108,7 +107,7 @@ async def get_user_company_links(
         links: List[
             UserCompanyLinkWithUser
         ] = await db.get_user_company_links_by_company(
-            company_id=company_id, limit=limit, offset=offset
+            company_id=company_id, limit=pagination.limit, offset=pagination.offset
         )
         total: int = await db.get_user_company_links_count_by_company(
             company_id=company_id
@@ -118,6 +117,6 @@ async def get_user_company_links(
             items=links,
             items_count=len(links),
             total_count=total,
-            limit=limit,
-            offset=offset,
+            limit=pagination.limit,
+            offset=pagination.offset,
         )
