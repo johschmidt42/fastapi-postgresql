@@ -23,7 +23,11 @@ from app_sqlalchemy_core.api.models import (
     CompanyInput,
     Company,
 )
-from app_sqlalchemy_core.api.pagination import LimitOffsetPage, create_paginate_query
+from app_sqlalchemy_core.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
 from app_sqlalchemy_core.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
@@ -84,12 +88,11 @@ async def get_company(
 )
 async def get_companies(
     db_session: Annotated[AsyncSession, Depends(get_db_session)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    offset: Annotated[int, Query(ge=0, le=1000)] = 0,
+    pagination: Annotated[PaginationParams, Depends()],
     order_by: Annotated[OrderByCompany, Query()] = None,
 ) -> LimitOffsetPage[CompanyResponseModel]:
     query: Select = create_paginate_query(
-        query=select(companies), limit=limit, offset=offset
+        query=select(companies), limit=pagination.limit, offset=pagination.offset
     )
 
     if order_by:
@@ -110,8 +113,8 @@ async def get_companies(
         items=rows,
         items_count=len(rows),
         total_count=total,
-        limit=limit,
-        offset=offset,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
 
 
