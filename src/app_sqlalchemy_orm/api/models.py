@@ -12,6 +12,7 @@ from pydantic import (
     Field,
     UUID4,
     model_validator,
+    ConfigDict,
 )
 
 
@@ -44,6 +45,10 @@ class BasePatch(BaseModel):
         return self
 
 
+class BaseInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
 # region Profession
 
 ProfessionName: Type = Annotated[
@@ -52,7 +57,7 @@ ProfessionName: Type = Annotated[
 ]
 
 
-class ProfessionInput(BaseModel):
+class ProfessionInput(BaseInput):
     name: ProfessionName
 
     @computed_field
@@ -96,7 +101,7 @@ UserName: Type = Annotated[
 ]
 
 
-class UserInput(BaseModel):
+class UserInput(BaseInput):
     name: UserName
     profession_id: UUID4
 
@@ -147,7 +152,7 @@ class UserShort(BaseModel):
 OrderAmount: Type = Annotated[Decimal, Field(gt=0, le=1_000_000, decimal_places=2)]
 
 
-class OrderInput(BaseModel):
+class OrderInput(BaseInput):
     amount: OrderAmount
     payer_id: UUID4
     payee_id: UUID4
@@ -188,7 +193,7 @@ class Order(BaseModel):
 NonEmptyDict: Type = Annotated[dict, Field(min_length=1)]
 
 
-class DocumentInput(BaseModel):
+class DocumentInput(BaseInput):
     document: NonEmptyDict
     user_id: UUID4
 
@@ -235,7 +240,7 @@ CompanyName: Type = Annotated[
 ]
 
 
-class CompanyInput(BaseModel):
+class CompanyInput(BaseInput):
     name: CompanyName
 
     @computed_field
@@ -280,7 +285,7 @@ class CompanyShort(BaseModel):
 # region UserCompanyLink
 
 
-class UserCompanyLinkInput(BaseModel):
+class UserCompanyLinkInput(BaseInput):
     user_id: UUID4
     company_id: UUID4
 

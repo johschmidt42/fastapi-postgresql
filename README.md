@@ -75,3 +75,4 @@ Go to [app_sqlalchemy](src/app_sqlalchemy_orm)
 - [ ] Indexes
 - [ ] Image for every user (but store on postgresql)
 - [ ] Search functionality
+- [ ] order by StrEnum is not shown correctly in swagger
