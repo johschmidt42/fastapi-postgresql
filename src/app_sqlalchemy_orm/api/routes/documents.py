@@ -6,10 +6,9 @@ from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app_sqlalchemy_orm.api.dependencies import (
-    validate_document_id,
-    get_db_session,
+from app_sqlalchemy_orm.api.dependencies.documents import (
     validate_document_input,
+    validate_document_id,
     validate_document_update,
 )
 from common.models import Document as DocumentResponseModel
@@ -21,6 +20,7 @@ from common.models import (
 from app_sqlalchemy_orm.db.db_models import Document
 from common.pagination import PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params
+from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 from common.sqlalchemy.sorting import create_order_by_query
 

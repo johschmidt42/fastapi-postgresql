@@ -5,12 +5,13 @@ from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy_orm.api.dependencies import (
-    get_db_session,
-    validate_profession_id,
+from app_sqlalchemy_orm.api.dependencies.professions import (
     validate_profession_input,
+    validate_profession_id,
     validate_profession_update,
 )
+
+
 from common.models import (
     ProfessionInput,
     ProfessionUpdate,
@@ -19,6 +20,7 @@ from common.models import Profession as ProfessionResponseModel
 
 from common.pagination import LimitOffsetPage, PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params
+from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 
 from app_sqlalchemy_orm.db.db_models import Profession
