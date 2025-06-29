@@ -3,7 +3,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
-from app_sqlalchemy_orm.db.db import DatabaseEngine
+from common.sqlalchemy.db import DatabaseEngine
 
 
 @asynccontextmanager
