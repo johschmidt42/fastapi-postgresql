@@ -9,7 +9,7 @@ from app_psycopg.api.dependencies import (
     validate_profession_input,
     validate_profession_update,
 )
-from app_psycopg.api.models import (
+from common.models import (
     ProfessionInput,
     Profession,
     ProfessionUpdate,

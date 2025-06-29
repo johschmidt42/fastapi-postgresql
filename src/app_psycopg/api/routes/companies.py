@@ -10,7 +10,7 @@ from app_psycopg.api.dependencies import (
     validate_company_update,
     validate_company_patch,
 )
-from app_psycopg.api.models import (
+from common.models import (
     CompanyInput,
     Company,
     CompanyUpdate,

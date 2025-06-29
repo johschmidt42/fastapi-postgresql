@@ -11,11 +11,11 @@ from app_sqlalchemy_orm.api.dependencies import (
     validate_profession_input,
     validate_profession_update,
 )
-from app_sqlalchemy_orm.api.models import (
+from common.models import (
     ProfessionInput,
     ProfessionUpdate,
 )
-from app_sqlalchemy_orm.api.models import Profession as ProfessionResponseModel
+from common.models import Profession as ProfessionResponseModel
 
 from common.pagination import LimitOffsetPage, PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params

@@ -5,7 +5,7 @@ from psycopg import Connection, AsyncConnection
 from pydantic import UUID4
 from starlette import status
 
-from app_psycopg.api.models import (
+from common.models import (
     OrderInput,
     UserInput,
     User,

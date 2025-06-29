@@ -14,12 +14,12 @@ from app_sqlalchemy_core.api.dependencies import (
     validate_company_update,
     validate_company_patch,
 )
-from app_sqlalchemy_core.api.models import (
+from common.models import (
     Company as CompanyResponseModel,
     CompanyUpdate,
     CompanyPatch,
 )
-from app_sqlalchemy_core.api.models import (
+from common.models import (
     CompanyInput,
     Company,
 )
