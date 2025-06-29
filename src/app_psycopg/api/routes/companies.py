@@ -3,13 +3,13 @@ from typing import Annotated, List, Type, Optional, Set
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator, UUID4
 
-from app_psycopg.api.dependencies import (
-    get_db,
-    validate_company_id,
+from app_psycopg.api.dependencies.companies import (
     validate_company_input,
+    validate_company_id,
     validate_company_update,
     validate_company_patch,
 )
+from app_psycopg.api.dependencies.db import get_db
 from common.models import (
     CompanyInput,
     Company,

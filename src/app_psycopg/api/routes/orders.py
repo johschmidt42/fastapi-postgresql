@@ -3,7 +3,8 @@ from typing import Annotated, List, Type, Optional, Set
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator, UUID4
 
-from app_psycopg.api.dependencies import get_db, validate_order_input, validate_order_id
+from app_psycopg.api.dependencies.db import get_db
+from app_psycopg.api.dependencies.orders import validate_order_input, validate_order_id
 from common.models import Order, OrderInputValidated
 from common.pagination import LimitOffsetPage, PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params

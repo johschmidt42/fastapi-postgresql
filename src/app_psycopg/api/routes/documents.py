@@ -3,10 +3,10 @@ from typing import Annotated, List, Type, Optional, Set
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import AfterValidator, UUID4
 
-from app_psycopg.api.dependencies import (
-    get_db,
-    validate_document_id,
+from app_psycopg.api.dependencies.db import get_db
+from app_psycopg.api.dependencies.documents import (
     validate_document_input,
+    validate_document_id,
     validate_document_update,
 )
 from common.models import (

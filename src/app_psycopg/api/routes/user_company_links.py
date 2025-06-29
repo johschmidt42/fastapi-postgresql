@@ -3,14 +3,14 @@ from typing import Annotated, Tuple, List
 from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 
-from app_psycopg.api.dependencies import (
-    get_db,
-    validate_user_id,
-    validate_company_id,
+from app_psycopg.api.dependencies.companies import validate_company_id
+from app_psycopg.api.dependencies.db import get_db
+from app_psycopg.api.dependencies.user_company_links import (
     validate_user_company_link_input,
     validate_user_company_link,
     validate_get_user_company_links,
 )
+from app_psycopg.api.dependencies.users import validate_user_id
 from common.models import (
     UserCompanyLinkInput,
     UserCompanyLinkWithCompany,
