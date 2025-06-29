@@ -19,7 +19,7 @@ from common.schemas import (
 from common.schemas import Company as CompanyResponseModel
 
 
-from app_sqlalchemy_orm.db.db_models import Company
+from app_sqlalchemy_orm.db.models import Company
 from common.pagination import LimitOffsetPage, PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session

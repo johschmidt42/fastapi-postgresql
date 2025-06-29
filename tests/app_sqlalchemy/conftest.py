@@ -23,7 +23,7 @@ from app_sqlalchemy_orm.api.models import (
     OrderInput,
     DocumentResponseModel,
 )
-from app_sqlalchemy_orm.db.db_models import User, Document
+from app_sqlalchemy_orm.db.models import User, Document
 
 
 class UserResponseFactory(ModelFactory[UserResponseModel]):

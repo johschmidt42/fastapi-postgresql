@@ -12,7 +12,7 @@ from app_sqlalchemy_orm.api.dependencies import (
     ValidatedOrder,
 )
 from app_sqlalchemy_orm.api.models import OrderInput
-from app_sqlalchemy_orm.db.db_models import User, Document
+from app_sqlalchemy_orm.db.models import User, Document
 from tests.app_sqlalchemy.conftest import UserFactory, DocumentFactory
 
 

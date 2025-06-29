@@ -8,7 +8,7 @@ from starlette import status
 
 from app_sqlalchemy_orm.api.dependencies.companies import validate_company_id
 from app_sqlalchemy_orm.api.dependencies.users import validate_user_id
-from app_sqlalchemy_orm.db.db_models import (
+from app_sqlalchemy_orm.db.models import (
     users_companies_table,
 )
 from common.schemas import (

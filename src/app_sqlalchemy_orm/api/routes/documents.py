@@ -17,7 +17,7 @@ from common.schemas import (
     DocumentUpdate,
 )
 
-from app_sqlalchemy_orm.db.db_models import Document
+from app_sqlalchemy_orm.db.models import Document
 from common.pagination import PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session

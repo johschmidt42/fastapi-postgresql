@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app_sqlalchemy_orm.api.dependencies.professions import validate_profession_id
-from app_sqlalchemy_orm.db.db_models import (
+from app_sqlalchemy_orm.db.models import (
     User,
 )
 from common.schemas import (

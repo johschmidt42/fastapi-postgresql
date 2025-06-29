@@ -23,7 +23,7 @@ from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 
-from app_sqlalchemy_orm.db.db_models import Profession
+from app_sqlalchemy_orm.db.models import Profession
 from common.sqlalchemy.sorting import create_order_by_query
 
 router: APIRouter = APIRouter(

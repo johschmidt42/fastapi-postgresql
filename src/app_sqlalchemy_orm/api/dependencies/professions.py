@@ -5,7 +5,7 @@ from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app_sqlalchemy_orm.db.db_models import (
+from app_sqlalchemy_orm.db.models import (
     Profession,
 )
 from common.schemas import (
