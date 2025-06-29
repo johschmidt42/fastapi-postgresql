@@ -17,7 +17,7 @@ from app_psycopg.api.models import (
     UserCompanyLinkWithUser,
     UserCompanyLinkResponse,
 )
-from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
+from common.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.db.db import Database
 
 router: APIRouter = APIRouter(

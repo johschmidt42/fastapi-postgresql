@@ -14,7 +14,7 @@ from app_psycopg.api.models import (
     Profession,
     ProfessionUpdate,
 )
-from app_psycopg.api.pagination import LimitOffsetPage, PaginationParams
+from common.pagination import LimitOffsetPage, PaginationParams
 from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
 from app_psycopg.db.db import Database
 
