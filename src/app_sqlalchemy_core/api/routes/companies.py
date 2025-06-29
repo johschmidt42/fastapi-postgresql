@@ -24,13 +24,11 @@ from app_sqlalchemy_core.api.models import (
     Company,
 )
 from common.pagination import LimitOffsetPage, PaginationParams
+from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.pagination import create_paginate_query
-from app_sqlalchemy_core.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
+
 from app_sqlalchemy_core.db.db_models import companies
+from common.sqlalchemy.sorting import create_order_by_query
 
 router: APIRouter = APIRouter(
     tags=["Companies"],

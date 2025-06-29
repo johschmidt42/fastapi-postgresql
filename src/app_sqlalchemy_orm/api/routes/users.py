@@ -10,13 +10,11 @@ from app_sqlalchemy_orm.api.dependencies import validate_user_id, get_db_session
 from app_sqlalchemy_orm.api.models import User as UserResponseModel
 from app_sqlalchemy_orm.api.models import UserInput, UserUpdate
 from common.pagination import LimitOffsetPage, PaginationParams
+from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.pagination import create_paginate_query
-from app_sqlalchemy_orm.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
+
 from app_sqlalchemy_orm.db.db_models import User
+from common.sqlalchemy.sorting import create_order_by_query
 
 router: APIRouter = APIRouter(
     tags=["Users"],

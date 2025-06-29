@@ -16,9 +16,10 @@ from app_psycopg.api.models import (
     CompanyUpdate,
     CompanyPatch,
 )
-from app_psycopg.api.sorting import create_order_by_enum, validate_order_by_query_params
+
 from app_psycopg.db.db import Database
 from common.pagination import LimitOffsetPage, PaginationParams
+from common.sorting import create_order_by_enum, validate_order_by_query_params
 
 router: APIRouter = APIRouter(
     tags=["Companies"],

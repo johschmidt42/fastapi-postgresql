@@ -17,14 +17,12 @@ from app_sqlalchemy_orm.api.models import (
     DocumentInput,
     DocumentUpdate,
 )
-from app_sqlalchemy_orm.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
+
 from app_sqlalchemy_orm.db.db_models import Document
 from common.pagination import PaginationParams
+from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.pagination import create_paginate_query
+from common.sqlalchemy.sorting import create_order_by_query
 
 router: APIRouter = APIRouter(
     tags=["Documents"],
