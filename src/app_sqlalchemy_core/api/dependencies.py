@@ -6,7 +6,7 @@ from sqlalchemy import select, Result, Select
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from starlette import status
 
-from app_sqlalchemy_core.api.models import (
+from common.models import (
     CompanyInput,
     CompanyUpdate,
     CompanyPatch,

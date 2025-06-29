@@ -6,7 +6,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from starlette import status
 
-from app_sqlalchemy_orm.api.models import (
+from common.models import (
     OrderInput,
     OrderInputValidated,
     ProfessionInput,
