@@ -11,8 +11,8 @@ from app_sqlalchemy_orm.api.dependencies.orders import (
 )
 
 
-from common.models import OrderInputValidated
-from common.models import Order as OrderResponseModel
+from common.schemas import OrderInputValidated
+from common.schemas import Order as OrderResponseModel
 from common.pagination import LimitOffsetPage, PaginationParams
 from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session

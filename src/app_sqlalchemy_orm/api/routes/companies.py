@@ -11,12 +11,12 @@ from app_sqlalchemy_orm.api.dependencies.companies import (
     validate_company_update,
     validate_company_patch,
 )
-from common.models import (
+from common.schemas import (
     CompanyInput,
     CompanyUpdate,
     CompanyPatch,
 )
-from common.models import Company as CompanyResponseModel
+from common.schemas import Company as CompanyResponseModel
 
 
 from app_sqlalchemy_orm.db.db_models import Company

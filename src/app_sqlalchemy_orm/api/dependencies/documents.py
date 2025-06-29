@@ -9,7 +9,7 @@ from app_sqlalchemy_orm.api.dependencies.users import validate_user_id
 from app_sqlalchemy_orm.db.db_models import (
     Document,
 )
-from common.models import (
+from common.schemas import (
     DocumentInput,
     DocumentUpdate,
 )

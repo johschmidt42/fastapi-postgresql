@@ -5,7 +5,7 @@ from psycopg.abc import Query
 from psycopg.rows import class_row
 from pydantic import BaseModel, UUID4
 
-from common.models import (
+from common.schemas import (
     UserInput,
     UserUpdate,
     OrderInput,

@@ -7,7 +7,7 @@ from starlette import status
 from app_psycopg.api.dependencies.db import get_db
 from app_psycopg.api.dependencies.professions import validate_profession_id
 from app_psycopg.db.db import Database
-from common.models import (
+from common.schemas import (
     UserInput,
     User,
     UserUpdate,

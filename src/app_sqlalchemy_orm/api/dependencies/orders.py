@@ -10,7 +10,7 @@ from app_sqlalchemy_orm.db.db_models import (
     User,
     Order,
 )
-from common.models import (
+from common.schemas import (
     OrderInput,
     OrderInputValidated,
 )

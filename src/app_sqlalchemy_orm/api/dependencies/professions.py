@@ -8,7 +8,7 @@ from starlette import status
 from app_sqlalchemy_orm.db.db_models import (
     Profession,
 )
-from common.models import (
+from common.schemas import (
     ProfessionInput,
     ProfessionUpdate,
 )

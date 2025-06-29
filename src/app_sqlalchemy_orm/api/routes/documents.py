@@ -11,8 +11,8 @@ from app_sqlalchemy_orm.api.dependencies.documents import (
     validate_document_id,
     validate_document_update,
 )
-from common.models import Document as DocumentResponseModel
-from common.models import (
+from common.schemas import Document as DocumentResponseModel
+from common.schemas import (
     DocumentInput,
     DocumentUpdate,
 )

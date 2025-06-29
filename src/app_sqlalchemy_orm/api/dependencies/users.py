@@ -9,7 +9,7 @@ from app_sqlalchemy_orm.api.dependencies.professions import validate_profession_
 from app_sqlalchemy_orm.db.db_models import (
     User,
 )
-from common.models import (
+from common.schemas import (
     UserInput,
     UserUpdate,
     UserPatch,

@@ -11,7 +11,7 @@ from app_psycopg.api.dependencies.user_company_links import (
     validate_get_user_company_links,
 )
 from app_psycopg.api.dependencies.users import validate_user_id
-from common.models import (
+from common.schemas import (
     UserCompanyLinkInput,
     UserCompanyLinkWithCompany,
     UserCompanyLinkWithUser,

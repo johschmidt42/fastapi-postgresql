@@ -8,7 +8,7 @@ from starlette import status
 from app_sqlalchemy_orm.db.db_models import (
     Company,
 )
-from common.models import (
+from common.schemas import (
     CompanyInput,
     CompanyUpdate,
     CompanyPatch,

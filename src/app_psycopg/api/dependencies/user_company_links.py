@@ -8,7 +8,7 @@ from app_psycopg.api.dependencies.companies import validate_company_id
 from app_psycopg.api.dependencies.db import get_db
 from app_psycopg.api.dependencies.users import validate_user_id
 from app_psycopg.db.db import Database
-from common.models import (
+from common.schemas import (
     UserCompanyLinkInput,
     UserCompanyLink,
 )

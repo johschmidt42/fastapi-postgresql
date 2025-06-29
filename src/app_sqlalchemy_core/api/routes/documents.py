@@ -12,7 +12,7 @@ from app_sqlalchemy_core.api.dependencies import (
     validate_document_input,
     validate_document_update,
 )
-from common.models import (
+from common.schemas import (
     DocumentInput,
     DocumentUpdate,
 )

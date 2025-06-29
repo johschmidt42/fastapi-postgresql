@@ -10,7 +10,7 @@ from app_psycopg.api.dependencies.users import (
     validate_user_update,
     validate_user_patch,
 )
-from common.models import (
+from common.schemas import (
     UserInput,
     UserUpdate,
     User,

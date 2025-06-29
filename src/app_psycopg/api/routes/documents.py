@@ -9,7 +9,7 @@ from app_psycopg.api.dependencies.documents import (
     validate_document_id,
     validate_document_update,
 )
-from common.models import (
+from common.schemas import (
     DocumentInput,
     Document,
     DocumentUpdate,
