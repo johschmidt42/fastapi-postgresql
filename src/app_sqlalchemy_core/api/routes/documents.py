@@ -1,7 +1,11 @@
-from typing import Annotated, List, Any, Type, Optional, Set
+from typing import Annotated, List, Any
 
+from app_sqlalchemy_core.api.models import Document as DocumentResponseModel
+from app_sqlalchemy_core.api.pagination import PaginationParams, create_paginate_query
+from app_sqlalchemy_core.api.sorting import (
+    create_order_by_query,
+)
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -12,29 +16,17 @@ from app_sqlalchemy_core.api.dependencies import (
     validate_document_input,
     validate_document_update,
 )
+from app_sqlalchemy_core.db.models import Document
+from common.order_by_enums import OrderByDocument
 from common.schemas import (
     DocumentInput,
     DocumentUpdate,
 )
-from app_sqlalchemy_core.api.models import Document as DocumentResponseModel
-from app_sqlalchemy_core.api.pagination import PaginationParams, create_paginate_query
-from app_sqlalchemy_core.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
-from app_sqlalchemy_core.db.models import Document
 
 router: APIRouter = APIRouter(
     tags=["Documents"],
     prefix="/documents",
 )
-
-document_sortable_fields: List[str] = ["created_at", "last_updated_at"]
-OrderByDocument: Type = Annotated[
-    Optional[Set[create_order_by_enum(document_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)

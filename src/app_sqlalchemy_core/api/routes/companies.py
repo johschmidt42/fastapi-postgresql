@@ -1,7 +1,7 @@
-from typing import Annotated, List, Type, Optional, Set, Sequence
+from typing import Annotated, Sequence
 
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator, UUID4
+from pydantic import UUID4
 from sqlalchemy import select, func, Select, Result, RowMapping
 from sqlalchemy import update, Update, delete, Delete, Insert
 from sqlalchemy.dialects.postgresql import insert
@@ -14,6 +14,9 @@ from app_sqlalchemy_core.api.dependencies.companies import (
     validate_company_update,
     validate_company_patch,
 )
+from app_sqlalchemy_core.db.models import companies
+from common.order_by_enums import OrderByCompany
+from common.pagination import LimitOffsetPage, PaginationParams
 from common.schemas import (
     Company as CompanyResponseModel,
     CompanyUpdate,
@@ -23,23 +26,13 @@ from common.schemas import (
     CompanyInput,
     Company,
 )
-from common.pagination import LimitOffsetPage, PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.pagination import create_paginate_query
-
-from app_sqlalchemy_core.db.models import companies
 from common.sqlalchemy.sorting import create_order_by_query
 
 router: APIRouter = APIRouter(
     tags=["Companies"],
     prefix="/companies",
 )
-
-company_sortable_fields: List[str] = ["name", "created_at", "last_updated_at"]
-OrderByCompany: Type = Annotated[
-    Optional[Set[create_order_by_enum(company_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=UUID4, status_code=status.HTTP_201_CREATED)

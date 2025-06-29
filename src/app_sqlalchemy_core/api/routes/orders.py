@@ -1,7 +1,16 @@
-from typing import Annotated, List, Type, Optional, Set, Sequence, Any
+from typing import Annotated, Sequence, Any
 
+from app_sqlalchemy_core.api.models import Order as OrderResponseModel
+from app_sqlalchemy_core.api.models import OrderInputValidated
+from app_sqlalchemy_core.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
+from app_sqlalchemy_core.api.sorting import (
+    create_order_by_query,
+)
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,32 +19,13 @@ from app_sqlalchemy_core.api.dependencies import (
     validate_order_input,
     validate_order_id,
 )
-from app_sqlalchemy_core.api.models import OrderInputValidated
-from app_sqlalchemy_core.api.models import Order as OrderResponseModel
-from app_sqlalchemy_core.api.pagination import (
-    LimitOffsetPage,
-    create_paginate_query,
-    PaginationParams,
-)
-from app_sqlalchemy_core.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
 from app_sqlalchemy_core.db.models import Order
+from common.order_by_enums import OrderByOrder
 
 router: APIRouter = APIRouter(
     tags=["Orders"],
     prefix="/orders",
 )
-
-order_sortable_fields: List[str] = [
-    "amount",
-]
-OrderByOrder: Type = Annotated[
-    Optional[Set[create_order_by_enum(order_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(

@@ -1,7 +1,19 @@
-from typing import Annotated, List, Type, Optional, Set, Sequence, Any
+from typing import Annotated, Sequence, Any
 
+from app_sqlalchemy_core.api.models import Profession as ProfessionResponseModel
+from app_sqlalchemy_core.api.models import (
+    ProfessionInput,
+    ProfessionUpdate,
+)
+from app_sqlalchemy_core.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
+from app_sqlalchemy_core.api.sorting import (
+    create_order_by_query,
+)
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,34 +23,12 @@ from app_sqlalchemy_core.api.dependencies import (
     validate_profession_input,
     validate_profession_update,
 )
-from app_sqlalchemy_core.api.models import (
-    ProfessionInput,
-    ProfessionUpdate,
-)
-from app_sqlalchemy_core.api.models import Profession as ProfessionResponseModel
-
-from app_sqlalchemy_core.api.pagination import (
-    LimitOffsetPage,
-    create_paginate_query,
-    PaginationParams,
-)
-from app_sqlalchemy_core.api.sorting import (
-    create_order_by_enum,
-    validate_order_by_query_params,
-    create_order_by_query,
-)
-
+from common.order_by_enums import OrderByProfession
 
 router: APIRouter = APIRouter(
     tags=["Professions"],
     prefix="/professions",
 )
-
-profession_sortable_fields: List[str] = ["name"]
-OrderByProfession: Type = Annotated[
-    Optional[Set[create_order_by_enum(profession_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)

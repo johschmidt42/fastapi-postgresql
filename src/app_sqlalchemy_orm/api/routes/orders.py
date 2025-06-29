@@ -1,7 +1,6 @@
-from typing import Annotated, List, Type, Optional, Set, Sequence, Any
+from typing import Annotated, Sequence, Any
 
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import select, func, Select, Result, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,12 +8,11 @@ from app_sqlalchemy_orm.api.dependencies.orders import (
     validate_order_input,
     validate_order_id,
 )
-
+from common.order_by_enums import OrderByOrder
 
 from common.schemas import OrderInputValidated
 from common.schemas import Order as OrderResponseModel
 from common.pagination import LimitOffsetPage, PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 
@@ -25,14 +23,6 @@ router: APIRouter = APIRouter(
     tags=["Orders"],
     prefix="/orders",
 )
-
-order_sortable_fields: List[str] = [
-    "amount",
-]
-OrderByOrder: Type = Annotated[
-    Optional[Set[create_order_by_enum(order_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(

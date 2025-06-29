@@ -1,7 +1,7 @@
-from typing import Annotated, List, Type, Optional, Set
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator, UUID4
+from pydantic import UUID4
 
 from app_psycopg.api.dependencies.companies import (
     validate_company_input,
@@ -10,6 +10,9 @@ from app_psycopg.api.dependencies.companies import (
     validate_company_patch,
 )
 from app_psycopg.api.dependencies.db import get_db
+from app_psycopg.db.db import Database
+from common.order_by_enums import OrderByCompany
+from common.pagination import LimitOffsetPage, PaginationParams
 from common.schemas import (
     CompanyInput,
     Company,
@@ -17,20 +20,10 @@ from common.schemas import (
     CompanyPatch,
 )
 
-from app_psycopg.db.db import Database
-from common.pagination import LimitOffsetPage, PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
-
 router: APIRouter = APIRouter(
     tags=["Companies"],
     prefix="/companies",
 )
-
-company_sortable_fields: List[str] = ["name", "created_at", "last_updated_at"]
-OrderByCompany: Type = Annotated[
-    Optional[Set[create_order_by_enum(company_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=UUID4, status_code=status.HTTP_201_CREATED)

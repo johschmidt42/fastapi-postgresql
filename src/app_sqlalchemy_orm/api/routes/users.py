@@ -1,16 +1,15 @@
-from typing import Annotated, List, Any, Type, Optional, Set
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import Select, Result, Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app_sqlalchemy_orm.api.dependencies.users import validate_user_id
+from common.order_by_enums import OrderByUser
 from common.schemas import User as UserResponseModel
 from common.schemas import UserInput, UserUpdate
 from common.pagination import LimitOffsetPage, PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 
@@ -21,12 +20,6 @@ router: APIRouter = APIRouter(
     tags=["Users"],
     prefix="/users",
 )
-
-user_sortable_fields: List[str] = ["name", "created_at", "last_updated_at"]
-OrderByUser: Type = Annotated[
-    Optional[Set[create_order_by_enum(user_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)

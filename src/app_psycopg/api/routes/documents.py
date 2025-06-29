@@ -1,7 +1,7 @@
-from typing import Annotated, List, Type, Optional, Set
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator, UUID4
+from pydantic import UUID4
 
 from app_psycopg.api.dependencies.db import get_db
 from app_psycopg.api.dependencies.documents import (
@@ -9,26 +9,19 @@ from app_psycopg.api.dependencies.documents import (
     validate_document_id,
     validate_document_update,
 )
+from app_psycopg.db.db import Database
+from common.order_by_enums import OrderByDocument
+from common.pagination import LimitOffsetPage, PaginationParams
 from common.schemas import (
     DocumentInput,
     Document,
     DocumentUpdate,
 )
-from common.pagination import LimitOffsetPage, PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
-from app_psycopg.db.db import Database
-
 
 router: APIRouter = APIRouter(
     tags=["Documents"],
     prefix="/documents",
 )
-
-document_sortable_fields: List[str] = ["created_at", "last_updated_at"]
-OrderByDocument: Type = Annotated[
-    Optional[Set[create_order_by_enum(document_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)

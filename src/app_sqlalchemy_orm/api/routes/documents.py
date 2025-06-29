@@ -1,7 +1,6 @@
-from typing import Annotated, List, Any, Type, Optional, Set
+from typing import Annotated, List, Any
 
 from fastapi import APIRouter, Depends, status, Query
-from pydantic import AfterValidator
 from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -11,6 +10,7 @@ from app_sqlalchemy_orm.api.dependencies.documents import (
     validate_document_id,
     validate_document_update,
 )
+from common.order_by_enums import OrderByDocument
 from common.schemas import Document as DocumentResponseModel
 from common.schemas import (
     DocumentInput,
@@ -19,7 +19,6 @@ from common.schemas import (
 
 from app_sqlalchemy_orm.db.models import Document
 from common.pagination import PaginationParams
-from common.sorting import create_order_by_enum, validate_order_by_query_params
 from common.sqlalchemy.dependencies import get_db_session
 from common.sqlalchemy.pagination import create_paginate_query
 from common.sqlalchemy.sorting import create_order_by_query
@@ -28,12 +27,6 @@ router: APIRouter = APIRouter(
     tags=["Documents"],
     prefix="/documents",
 )
-
-document_sortable_fields: List[str] = ["created_at", "last_updated_at"]
-OrderByDocument: Type = Annotated[
-    Optional[Set[create_order_by_enum(document_sortable_fields)]],
-    AfterValidator(validate_order_by_query_params),
-]
 
 
 @router.post(path="", response_model=str, status_code=status.HTTP_201_CREATED)
