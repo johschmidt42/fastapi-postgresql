@@ -22,7 +22,7 @@ from app_sqlalchemy_core.api.sorting import (
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy_core.db.db_models import Order
+from app_sqlalchemy_core.db.models import Order
 
 router: APIRouter = APIRouter(
     tags=["Orders"],

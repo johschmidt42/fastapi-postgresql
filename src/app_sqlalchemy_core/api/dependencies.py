@@ -12,7 +12,7 @@ from common.schemas import (
     CompanyPatch,
     Company,
 )
-from app_sqlalchemy_core.db.db_models import companies
+from app_sqlalchemy_core.db.models import companies
 
 
 async def get_db_connection(request: Request) -> AsyncGenerator[AsyncConnection, None]:
