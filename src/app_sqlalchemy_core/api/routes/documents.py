@@ -6,25 +6,24 @@ from sqlalchemy import Select, Result, Sequence, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app_sqlalchemy_orm.api.dependencies import (
+from app_sqlalchemy_core.api.dependencies import (
     validate_document_id,
     get_db_session,
     validate_document_input,
     validate_document_update,
 )
-from app_sqlalchemy_orm.api.models import Document as DocumentResponseModel
-from app_sqlalchemy_orm.api.models import (
+from app_sqlalchemy_core.api.models import (
     DocumentInput,
     DocumentUpdate,
 )
-from app_sqlalchemy_orm.api.sorting import (
+from app_sqlalchemy_core.api.models import Document as DocumentResponseModel
+from app_sqlalchemy_core.api.pagination import PaginationParams, create_paginate_query
+from app_sqlalchemy_core.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy_orm.db.db_models import Document
-from common.pagination import PaginationParams
-from common.sqlalchemy.pagination import create_paginate_query
+from app_sqlalchemy_core.db.db_models import Document
 
 router: APIRouter = APIRouter(
     tags=["Documents"],

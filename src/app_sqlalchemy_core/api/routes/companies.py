@@ -23,11 +23,8 @@ from app_sqlalchemy_core.api.models import (
     CompanyInput,
     Company,
 )
-from app_sqlalchemy_core.api.pagination import (
-    LimitOffsetPage,
-    create_paginate_query,
-    PaginationParams,
-)
+from common.pagination import LimitOffsetPage, PaginationParams
+from common.sqlalchemy.pagination import create_paginate_query
 from app_sqlalchemy_core.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,

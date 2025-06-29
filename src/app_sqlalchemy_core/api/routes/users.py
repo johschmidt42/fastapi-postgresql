@@ -6,17 +6,20 @@ from sqlalchemy import Select, Result, Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app_sqlalchemy_orm.api.dependencies import validate_user_id, get_db_session
-from app_sqlalchemy_orm.api.models import User as UserResponseModel
-from app_sqlalchemy_orm.api.models import UserInput, UserUpdate
-from common.pagination import LimitOffsetPage, PaginationParams
-from common.sqlalchemy.pagination import create_paginate_query
-from app_sqlalchemy_orm.api.sorting import (
+from app_sqlalchemy_core.api.dependencies import validate_user_id, get_db_session
+from app_sqlalchemy_core.api.models import User as UserResponseModel
+from app_sqlalchemy_core.api.models import UserInput, UserUpdate
+from app_sqlalchemy_core.api.pagination import (
+    LimitOffsetPage,
+    create_paginate_query,
+    PaginationParams,
+)
+from app_sqlalchemy_core.api.sorting import (
     create_order_by_enum,
     validate_order_by_query_params,
     create_order_by_query,
 )
-from app_sqlalchemy_orm.db.db_models import User
+from app_sqlalchemy_core.db.db_models import User
 
 router: APIRouter = APIRouter(
     tags=["Users"],
