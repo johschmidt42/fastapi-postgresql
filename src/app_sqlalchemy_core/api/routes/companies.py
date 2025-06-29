@@ -7,7 +7,7 @@ from sqlalchemy import update, Update, delete, Delete, Insert
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_sqlalchemy_core.api.dependencies import (
+from app_sqlalchemy_core.api.dependencies.companies import (
     get_db_session,
     validate_company_id,
     validate_company_input,
